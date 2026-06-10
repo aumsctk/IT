@@ -55,7 +55,6 @@ export function DashboardClient({ kpi, warrantyTimeline, byCategory, byStatus, e
           <h1 className="text-2xl font-bold text-slate-900">{greeting}</h1>
           <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
             {t(tr.dashboard.subtitle)}
-            <span className="badge badge-amber">Demo</span>
           </p>
         </div>
         <Link href="/assets/new" className="sp-btn-primary hidden sm:flex shrink-0">
