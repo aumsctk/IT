@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 type Mode = "password" | "magic";
 
-export default function LoginPage() {
+function LoginPage() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const redirect     = searchParams.get("redirect") ?? "/dashboard";
@@ -225,5 +225,14 @@ export default function LoginPage() {
         Contact your IT administrator if you don't have an account.
       </p>
     </div>
+  );
+}
+
+import { Suspense } from "react";
+export default function LoginPageWrapper() {
+  return (
+    <Suspense>
+      <LoginPage />
+    </Suspense>
   );
 }

@@ -22,7 +22,7 @@ const PRIORITIES = [
   { value: "critical", th: "เร่งด่วน", en: "Critical" },
 ];
 
-export default function NewTicketPage() {
+function NewTicketPage() {
   const router = useRouter();
   const params = useSearchParams();
   const { locale } = useLanguage();
@@ -232,5 +232,14 @@ export default function NewTicketPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+import { Suspense } from "react";
+export default function NewTicketPageWrapper() {
+  return (
+    <Suspense>
+      <NewTicketPage />
+    </Suspense>
   );
 }
