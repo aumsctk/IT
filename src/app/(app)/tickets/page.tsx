@@ -373,7 +373,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function sel() { return "sp-input"; }
+function sel() { return "sp-select"; }
 
 function ActionBtn({ children, cls, onClick }: { children: React.ReactNode; cls?: string; onClick?: () => void }) {
   return (
