@@ -188,7 +188,7 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
         backgroundColor:sb.bg,
         borderRight:`1px solid ${sb.border}`,
         width: collapsed ? "64px" : "220px",
-        flexShrink:0, display:"flex", flexDirection:"column",
+        flexShrink:0, flexDirection:"column",
         transition:"width 0.2s ease",
       }} className="hidden md:flex">
         {collapsed ? (
@@ -244,7 +244,7 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
             <LanguageSwitcher variant="light" />
           </div>
         </header>
-        <main style={{flex:1, overflow:"auto", background:sb.main}}>
+        <main style={{flex:1, overflow:"auto", background:sb.main}} className="pb-16 md:pb-0">
           {children}
         </main>
         <MobileNav items={mobileNavItems} />
