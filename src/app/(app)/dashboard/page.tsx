@@ -75,6 +75,22 @@ export default function DashboardPage() {
       }
       setWarrantyTimeline(months);
 
+      // asset trend: compare assets added this month vs last month
+      const startThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const thisMonthCount = assets.filter(a => new Date(a.created_at) >= startThisMonth).length;
+      const lastMonthCount = assets.filter(a => {
+        const d = new Date(a.created_at);
+        return d >= startLastMonth && d < startThisMonth;
+      }).length;
+      let assetTrend: string | null = null;
+      if (lastMonthCount > 0) {
+        const pct = Math.round(((thisMonthCount - lastMonthCount) / lastMonthCount) * 100);
+        assetTrend = (pct >= 0 ? "+" : "") + pct + "%";
+      } else if (thisMonthCount > 0) {
+        assetTrend = "+100%";
+      }
+
       // recentTickets
       setRecentTickets(tickets.slice(0, 5).map((t) => ({ ...t, creator: { full_name: t.reporter_name } })));
 
@@ -101,6 +117,7 @@ export default function DashboardPage() {
 
       setKpi({
         totalAssets: assets.length,
+        assetTrend,
         activeAssets: stats.activeAssets,
         idleAssets: stats.idleAssets,
         underRepair: stats.underRepair,

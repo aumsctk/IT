@@ -65,7 +65,7 @@ export function DashboardClient({ kpi, warrantyTimeline, byCategory, byStatus, e
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KpiCard label={t(tr.dashboard.kpi.totalAssets)}  value={kpi.totalAssets}  sub={`${kpi.activeAssets} ${t(tr.dashboard.kpi.active)}`}                     icon={Package} color="indigo" href="/assets"            trend="+2.4%" />
+        <KpiCard label={t(tr.dashboard.kpi.totalAssets)}  value={kpi.totalAssets}  sub={`${kpi.activeAssets} ${t(tr.dashboard.kpi.active)}`}                     icon={Package} color="indigo" href="/assets"            trend={kpi.assetTrend ?? null} />
         <KpiCard label={t(tr.dashboard.kpi.idle)}         value={kpi.idleAssets}   sub={t(tr.dashboard.kpi.readyDeploy)}                                           icon={Layers}  color="slate"  href="/assets?status=idle" />
         <KpiCard label={t(tr.dashboard.kpi.openTickets)}  value={kpi.openTickets}  sub={`${kpi.underRepair} ${t(tr.dashboard.kpi.underRepair)}`}                   icon={Ticket}  color="amber"  href="/tickets"            alert={kpi.openTickets > 5} />
         <KpiCard label={t(tr.dashboard.kpi.occupancy)}    value={`${kpi.occupancyPct}%`} sub={`${kpi.occupiedSeats} / ${kpi.totalSeats} ${t(tr.dashboard.kpi.seats)}`} icon={Users} color="green"  href="/floor-plan" />
@@ -210,7 +210,7 @@ function KpiCard({ label, value, sub, icon: Icon, color, href, trend, alert }: {
           <Icon size={17} className={c.iconFg} />
         </div>
         {trend && (
-          <span className="flex items-center gap-0.5 text-[11px] font-semibold text-green-600">
+          <span className={`flex items-center gap-0.5 text-[11px] font-semibold ${trend!.startsWith("-") ? "text-red-500" : "text-green-600"}`}>
             <TrendingUp size={10} /> {trend}
           </span>
         )}
