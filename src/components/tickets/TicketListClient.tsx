@@ -70,7 +70,7 @@ export function TicketListClient({ initialTickets, initialTotal, isStaff }: Prop
 
       {/* Filter bar */}
       <div className="filter-bar bg-white">
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
+        <div className="relative w-48 shrink-0">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           <input
             value={search} onChange={(e) => setSearch(e.target.value)}
