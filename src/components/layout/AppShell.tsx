@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, Users, Map, Ticket,
-  ClipboardCheck, Settings, ScanLine, Menu, X, ChevronLeft,
+  ClipboardCheck, Settings, ScanLine, Menu, X, ChevronLeft, UserCheck,
 } from "lucide-react";
 import { Omnibar } from "./Omnibar";
 import { MobileNav } from "./MobileNav";
@@ -58,6 +58,7 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
     { label: t(tr.nav.dashboard), href: "/dashboard",  icon: LayoutDashboard },
     { label: t(tr.nav.assets),    href: "/assets",     icon: Package         },
     { label: t(tr.nav.employees), href: "/employees",  icon: Users           },
+    { label: t(tr.nav.assignments), href: "/assignments", icon: UserCheck     },
     { label: t(tr.nav.floorPlan), href: "/floor-plan", icon: Map             },
     { label: t(tr.nav.tickets),   href: "/tickets",    icon: Ticket          },
     { label: t(tr.nav.audit),     href: "/audit",      icon: ClipboardCheck, roles: ["super_admin","it_support"] },

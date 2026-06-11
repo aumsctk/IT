@@ -107,7 +107,7 @@ type FormState = {
   branch_id: string; status: string; condition: string;
   purchase_price: string; currency: string; warranty_expiry: string;
   hostname: string; ip_address: string; notes: string;
-  assigned_to_id: string;
+  assigned_to_id: string; assigned_to_name: string;
 };
 const DEFAULT_FORM: FormState = {
   asset_tag: "", serial_number: "",
@@ -115,7 +115,7 @@ const DEFAULT_FORM: FormState = {
   branch_id: "b01", status: "idle", condition: "good",
   purchase_price: "", currency: "THB", warranty_expiry: "",
   hostname: "", ip_address: "", notes: "",
-  assigned_to_id: "",
+  assigned_to_id: "", assigned_to_name: "",
 };
 
 function parseDate(raw: string): string {
@@ -246,6 +246,7 @@ export function AssetFormPageClient({ assetId }: { assetId?: string }) {
         ip_address:      existing.ip_address      ?? "",
         notes:           existing.notes           ?? "",
         assigned_to_id:  existing.assigned_to_id  ?? "",
+        assigned_to_name: existing.assigned_to_name ?? "",
       });
     }
     })();
@@ -293,7 +294,9 @@ export function AssetFormPageClient({ assetId }: { assetId?: string }) {
     if (!form.asset_tag.trim()) return;
     setSaving(true);
     const branch   = DEMO_BRANCHES.find(b => b.id === form.branch_id);
-    const assignee = employees.find(e => e.id === form.assigned_to_id);
+    // ชื่อพิมพ์ตรง ๆ ได้ — ถ้าตรงกับพนักงานในระบบจะเก็บ id ให้ด้วย
+    const typedName = form.assigned_to_name.trim();
+    const matched   = employees.find(e => e.full_name === typedName);
     // Status is controlled by floor plan assignment, not the form directly.
     // Form just preserves the existing status value without auto-changing it.
     const payload = {
@@ -301,8 +304,8 @@ export function AssetFormPageClient({ assetId }: { assetId?: string }) {
       status:           form.status,
       branch_name:      branch?.name ?? form.branch_id,
       branch_code:      branch?.code ?? "",
-      assigned_to_id:   form.assigned_to_id   || null,
-      assigned_to_name: assignee?.full_name   ?? null,
+      assigned_to_id:   matched?.id ?? null,
+      assigned_to_name: typedName || null,
     };
     if (isEdit && assetId) {
       await assetDB.update(assetId, payload);
@@ -414,29 +417,28 @@ export function AssetFormPageClient({ assetId }: { assetId?: string }) {
 
         <Section title={isTh ? "มอบหมายให้พนักงาน" : "Assign to Employee"}>
           <Field label={isTh ? "พนักงานที่รับผิดชอบ" : "Assigned To"}>
-            <select value={form.assigned_to_id}
-              onChange={e => {
-                const v = e.target.value;
-                set("assigned_to_id", v);
-                // Status is NOT changed here — it's controlled by floor plan assignment only
-              }}
-              className={inp()}>
-              <option value="">{isTh ? "-- ยังไม่มอบหมาย --" : "-- Unassigned --"}</option>
+            <input list="employee-suggestions"
+              value={form.assigned_to_name}
+              onChange={e => set("assigned_to_name", e.target.value)}
+              placeholder={isTh ? "พิมพ์ชื่อ หรือเลือกจากรายชื่อพนักงาน..." : "Type a name or pick from employees..."}
+              className={inp()} />
+            <datalist id="employee-suggestions">
               {employees.map(e => (
-                <option key={e.id} value={e.id}>
-                  {e.full_name}{e.emp_code ? ` (${e.emp_code})` : ""}
+                <option key={e.id} value={e.full_name}>
+                  {e.emp_code ? `(${e.emp_code})` : ""}
                 </option>
               ))}
-            </select>
-            {employees.length === 0 && (
-              <p className="text-xs text-amber-600 mt-1">
-                {isTh ? "ยังไม่มีพนักงานในระบบ — เพิ่มที่หน้าพนักงานก่อน" : "No employees yet — add them in the Employees page first"}
-              </p>
-            )}
-            {form.assigned_to_id && (
-              <p className="text-xs text-green-600 mt-1">
-                {isTh ? "✓ สถานะจะเปลี่ยนเป็น «ใช้งานอยู่» อัตโนมัติ" : "✓ Status will auto-set to «Active»"}
-              </p>
+            </datalist>
+            {form.assigned_to_name.trim() && (
+              employees.some(e => e.full_name === form.assigned_to_name.trim()) ? (
+                <p className="text-xs text-green-600 mt-1">
+                  {isTh ? "✓ ตรงกับพนักงานในระบบ" : "✓ Matches an employee in the system"}
+                </p>
+              ) : (
+                <p className="text-xs text-slate-400 mt-1">
+                  {isTh ? "บันทึกเป็นชื่ออิสระ (ไม่อยู่ในหมวดพนักงาน)" : "Saved as free-text name (not in Employees)"}
+                </p>
+              )
             )}
           </Field>
         </Section>

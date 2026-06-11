@@ -11,6 +11,7 @@ export const translations = {
     dashboard:  { th: "หน้าหลัก",       en: "Dashboard"   },
     assets:     { th: "ทรัพย์สิน IT",    en: "Assets"      },
     employees:  { th: "พนักงาน",         en: "Employees"   },
+    assignments:{ th: "ผู้รับผิดชอบ",     en: "Assignments" },
     floorPlan:  { th: "ผังพื้นที่",       en: "Floor Plan"  },
     tickets:    { th: "แจ้งปัญหา",       en: "Tickets"     },
     audit:      { th: "ตรวจสอบสินทรัพย์",en: "Audit"       },
