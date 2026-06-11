@@ -36,22 +36,23 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
 
   
 
-  // theme tokens
+  // theme tokens — liquid glass
   const sb = {
-    bg:          isDark ? "#0f172a" : "#ffffff",
-    border:      isDark ? "rgba(255,255,255,0.07)" : "#e2e8f0",
+    bg:          isDark ? "rgba(15,23,42,0.6)" : "rgba(255,255,255,0.55)",
+    border:      isDark ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.6)",
     labelActive: isDark ? "#f1f5f9" : undefined, // undefined = use color
     labelInact:  isDark ? "#94a3b8" : "#64748b",
-    iconInact:   isDark ? "rgba(255,255,255,0.06)" : "#f1f5f9",
+    iconInact:   isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.05)",
     iconInactColor: isDark ? "#94a3b8" : "#94a3b8",
-    hoverBg:     isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9",
+    hoverBg:     isDark ? "rgba(255,255,255,0.05)" : "rgba(15,23,42,0.05)",
     logoText:    isDark ? "#f1f5f9" : "#1e293b",
     logoSub:     isDark ? "#64748b" : "#94a3b8",
     chevron:     isDark ? "#475569" : "#94a3b8",
     chevronHover:isDark ? "#94a3b8" : "#64748b",
-    hdr:         isDark ? "#0f172a" : "#ffffff",
-    hdrBorder:   isDark ? "rgba(255,255,255,0.07)" : "rgba(226,232,240,0.8)",
-    main:        isDark ? "#0d1525" : "#f1f5f9",
+    hdr:         isDark ? "rgba(15,23,42,0.55)" : "rgba(255,255,255,0.5)",
+    hdrBorder:   isDark ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.6)",
+    main:        "transparent",
+    blur:        "blur(24px) saturate(180%)",
   };
 
   const NAV_ITEMS = [
@@ -182,11 +183,12 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
   );
 
   return (
-    <div style={{display:"flex",height:"100dvh",width:"100%",overflow:"hidden",background:sb.main}}>
+    <div style={{display:"flex",height:"100dvh",width:"100%",overflow:"hidden",background:"transparent"}}>
 
       {/* Desktop sidebar */}
       <aside style={{
         backgroundColor:sb.bg,
+        backdropFilter:sb.blur, WebkitBackdropFilter:sb.blur,
         borderRight:`1px solid ${sb.border}`,
         width: collapsed ? "64px" : "220px",
         flexShrink:0, flexDirection:"column",
@@ -216,7 +218,9 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <aside style={{backgroundColor:sb.bg, borderRight:`1px solid ${sb.border}`}}
+          <aside style={{backgroundColor: isDark ? "rgba(15,23,42,0.85)" : "rgba(255,255,255,0.8)",
+            backdropFilter:sb.blur, WebkitBackdropFilter:sb.blur,
+            borderRight:`1px solid ${sb.border}`}}
             className="absolute left-0 top-0 bottom-0 w-[260px] flex flex-col z-50 shadow-2xl">
             <LogoBlock mobile />
             <SidebarContent />
@@ -229,7 +233,8 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
         <header style={{
           display:"flex", height:"56px", alignItems:"center", gap:"12px",
           borderBottom:`1px solid ${sb.hdrBorder}`,
-          background:sb.hdr, padding:"0 16px", flexShrink:0, zIndex:20,
+          background:sb.hdr, backdropFilter:sb.blur, WebkitBackdropFilter:sb.blur,
+          padding:"0 16px", flexShrink:0, zIndex:20,
         }}>
           <button onClick={() => setMobileOpen(true)} className="md:hidden" style={{
             borderRadius:"8px", padding:"6px", color:"#64748b",
@@ -245,7 +250,7 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
             <LanguageSwitcher variant="light" />
           </div>
         </header>
-        <main style={{flex:1, overflow:"auto", background:sb.main}} className="pb-16 md:pb-0">
+        <main style={{flex:1, overflow:"auto", background:"transparent"}} className="pb-20 md:pb-0">
           {children}
         </main>
         <MobileNav items={mobileNavItems} />

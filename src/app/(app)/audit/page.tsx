@@ -29,7 +29,7 @@ export default function AuditPage() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-slate-100">
+    <div className="flex flex-col h-full overflow-hidden">
       {ConfirmUI}
 
       {/* Header */}

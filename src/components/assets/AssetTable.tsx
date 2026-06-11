@@ -65,7 +65,7 @@ export function AssetTable({ assets }: { assets: Asset[] }) {
   return (
     <div className="flex-1 overflow-auto">
       <table className="w-full text-sm">
-        <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
+        <thead className="sticky top-0 bg-white/75 backdrop-blur-md border-b border-slate-200/60 z-10">
           <tr>
             <th className="th w-12" />
             <th className="th">{isTh ? "รหัสสินทรัพย์" : "Asset Tag"}</th>

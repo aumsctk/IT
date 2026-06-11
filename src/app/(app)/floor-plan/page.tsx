@@ -195,6 +195,7 @@ export default function FloorPlanPage() {
 
   const dragRef   = useRef<DragOp|null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const wrapRef   = useRef<HTMLDivElement>(null);
 
   const canvasW = Math.max(640, ...zones.map(z=>z.x+z.w), ...seats.map(s=>s.x+s.w)) + 60;
   const canvasH = Math.max(380, ...zones.map(z=>z.y+z.h), ...seats.map(s=>s.y+s.h)) + 60;
@@ -353,11 +354,26 @@ export default function FloorPlanPage() {
 </body></html>`;
 
     const win = window.open("","_blank","width=900,height=700");
-    if(!win) return;
+    if(!win){
+      alert(isTh?"เบราว์เซอร์บล็อกป๊อปอัป — กรุณาอนุญาตป๊อปอัปสำหรับเว็บนี้แล้วลองใหม่":"Popup blocked — please allow popups for this site");
+      return;
+    }
     win.document.write(html);
     win.document.close();
-    win.onload = () => { win.focus(); win.print(); };
+    // document.write ทำให้ onload ไม่ยิงในบางเบราว์เซอร์ — สั่งพิมพ์ตรง ๆ หลังรอ render
+    setTimeout(()=>{ try{ win.focus(); win.print(); }catch{} }, 500);
   }
+
+  // ── Fit zoom to screen ──
+  function fitToScreen(){
+    const el = wrapRef.current;
+    if(!el) return;
+    const fit = Math.min((el.clientWidth-48)/canvasW, (el.clientHeight-48)/canvasH, 1.5);
+    setZoom(Math.max(0.3, +fit.toFixed(2)));
+  }
+  useEffect(()=>{ if(_loaded) fitToScreen();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[currentId,_loaded]);
 
   function addFloor(){
     const id=uid();
@@ -371,11 +387,11 @@ export default function FloorPlanPage() {
   const isSearchHit = (seatId:string) => searchResult?.floorId===currentId && searchResult?.seatId===seatId;
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
       {ConfirmUI}
 
       {/* ── Sidebar ── */}
-      <div className="w-52 bg-white border-r flex flex-col flex-shrink-0 text-xs">
+      <div className="w-52 bg-white/55 backdrop-blur-xl border-r border-white/60 flex flex-col flex-shrink-0 text-xs">
         <div className="px-4 py-3 border-b font-bold text-sm text-gray-900">{isTh?"ผังพื้นที่":"Floor Plan"}</div>
 
         {/* Search */}
@@ -450,7 +466,7 @@ export default function FloorPlanPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Floor tabs */}
-        <div className="bg-white border-b px-3 pt-2 flex items-end gap-1 text-xs">
+        <div className="bg-white/50 backdrop-blur-xl border-b border-white/60 px-3 pt-2 flex items-end gap-1 text-xs">
           {floors.map(fl=>(
             <div key={fl.id} className="flex items-center">
               <button onClick={()=>{setCurrentId(fl.id);setSelected(null);setSearchResult(null);setSearch("");}}
@@ -469,7 +485,7 @@ export default function FloorPlanPage() {
         </div>
 
         {/* Toolbar */}
-        <div className="bg-white border-b px-4 py-2 flex items-center gap-2 text-xs">
+        <div className="bg-white/45 backdrop-blur-xl border-b border-white/50 px-4 py-2 flex items-center gap-2 text-xs">
           {tool!=="select"&&(
             <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium">
               {tool==="add_seat"?(isTh?"คลิกเพื่อวางโต๊ะ":"Click to place desk"):(isTh?"คลิกเพื่อสร้างโซน":"Click to create zone")}
@@ -500,14 +516,15 @@ export default function FloorPlanPage() {
             <span className="w-12 text-center tabular-nums text-gray-700">{Math.round(zoom*100)}%</span>
             <button onClick={()=>setZoom(z=>Math.min(3,+(z+0.1).toFixed(1)))} className="px-2 py-1 hover:bg-gray-100">+</button>
           </div>
-          <button onClick={()=>setZoom(1)} className="border rounded-lg px-2.5 py-1 text-gray-600 hover:bg-gray-100">{isTh?"รีเซต":"Reset"}</button>
+          <button onClick={fitToScreen} className="border rounded-lg px-2.5 py-1 text-gray-600 hover:bg-gray-100">{isTh?"พอดีจอ":"Fit"}</button>
+          <button onClick={()=>setZoom(1)} className="border rounded-lg px-2.5 py-1 text-gray-600 hover:bg-gray-100">100%</button>
           <button onClick={handlePrint} className="border rounded-lg px-2.5 py-1 text-gray-600 hover:bg-gray-100 flex items-center gap-1">
             🖨 {isTh?"พิมพ์":"Print"}
           </button>
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 overflow-auto bg-gray-100 p-6">
+        <div ref={wrapRef} className="flex-1 overflow-auto bg-slate-200/30 p-6">
           <div style={{width:canvasW*zoom,height:canvasH*zoom,position:"relative"}}>
             <div ref={canvasRef} onClick={handleCanvasClick}
               style={{position:"absolute",top:0,left:0,width:canvasW,height:canvasH,background:"white",

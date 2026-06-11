@@ -77,7 +77,7 @@ export default function TicketsPage() {
   const hasFilter = !!(search || filterStatus || filterType || filterPriority);
 
   return (
-    <div className="flex h-full overflow-hidden bg-slate-100">
+    <div className="flex h-full overflow-hidden">
 
       {/* ── List panel ── */}
       <div className={cn("flex flex-col flex-1 min-w-0 border-r border-slate-200", selected ? "hidden lg:flex" : "flex")}>

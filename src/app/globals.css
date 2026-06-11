@@ -3,144 +3,189 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════
-   SLATE PRO — Design System
-   Sidebar: navy #0F172A | Content: slate-100 | Primary: indigo
+   LIQUID GLASS — Apple-inspired Design System
+   Frosted translucent surfaces · soft depth · pill controls
 ═══════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
     /* Core surfaces */
-    --background:      210 40% 96%;   /* #F1F5F9 slate-100 */
-    --foreground:      222 47% 11%;   /* #0F172A slate-900 */
+    --background:      220 33% 96%;
+    --foreground:      222 47% 11%;
 
     /* Card / panel */
-    --card:            0 0% 100%;     /* #FFFFFF */
+    --card:            0 0% 100%;
     --card-foreground: 222 47% 11%;
 
-    /* Sidebar (computed in component, exposed for reference) */
-    --sidebar:         222 47% 11%;   /* #0F172A */
-    --sidebar-fg:      215 20% 65%;   /* #94A3B8 slate-400 */
+    --sidebar:         222 47% 11%;
+    --sidebar-fg:      215 20% 65%;
 
     /* Primary — Indigo */
-    --primary:         239 84% 67%;   /* #6366F1 indigo-500 */
+    --primary:         239 84% 67%;
     --primary-foreground: 0 0% 100%;
 
-    /* Muted / secondary */
-    --muted:           214 32% 91%;   /* #E2E8F0 slate-200 */
-    --muted-foreground:215 16% 47%;   /* #64748B slate-500 */
+    --muted:           214 32% 91%;
+    --muted-foreground:215 16% 47%;
 
-    /* Borders */
-    --border:          214 32% 91%;   /* #E2E8F0 */
-    --input:           214 32% 91%;
+    --border:          214 32% 89%;
+    --input:           214 32% 89%;
 
-    /* Accent (hover bg) */
-    --accent:          224 64% 95%;   /* #EEF2FF indigo-50 */
+    --accent:          224 64% 95%;
     --accent-foreground: 239 84% 67%;
 
-    /* States */
     --destructive:     0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --ring:            239 84% 67%;
-    --radius:          0.5rem;
+    --radius:          1rem;
 
-    /* Popover */
     --popover:         0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Secondary */
     --secondary:       214 32% 91%;
     --secondary-foreground: 222 47% 11%;
+
+    /* Liquid glass tokens */
+    --glass-bg:        255 255 255;
+    --glass-alpha:     0.62;
+    --glass-border:    rgba(255, 255, 255, 0.65);
+    --glass-shadow:    0 8px 32px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background-color: hsl(var(--background));
-    color:            hsl(var(--foreground));
-    font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+    color: hsl(var(--foreground));
+    font-family: "Inter", "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont,
                  "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Apple-like ambient backdrop */
+    background-color: #eef1f7;
+    background-image:
+      radial-gradient(1100px 600px at 8% -10%,  rgba(99, 102, 241, 0.14), transparent 60%),
+      radial-gradient(900px 500px  at 100% 0%,  rgba(56, 189, 248, 0.12), transparent 55%),
+      radial-gradient(900px 600px  at 50% 110%, rgba(168, 85, 247, 0.10), transparent 55%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     color: hsl(var(--foreground));
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   /* Thin scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: rgba(100, 116, 139, 0.35);
     border-radius: 99px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.55); }
 }
 
 /* ─── Utility classes ──────────────────────────────────────── */
 @layer components {
 
+  /* ── Liquid glass surface ── */
+  .glass {
+    background: rgba(var(--glass-bg) / var(--glass-alpha));
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-soft {
+    background: rgba(var(--glass-bg) / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  }
+
   /* ── Cards ── */
   .sp-card {
-    @apply bg-white rounded-xl shadow-sm border border-slate-200/80;
+    @apply rounded-2xl;
+    background: rgba(var(--glass-bg) / var(--glass-alpha));
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
   .sp-card-hover {
-    @apply sp-card transition-all duration-150
-           hover:shadow-md hover:border-slate-300/80 cursor-pointer;
+    @apply sp-card transition-all duration-200 cursor-pointer;
+  }
+  .sp-card-hover:hover {
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12), 0 2px 4px rgba(15, 23, 42, 0.05);
+    transform: translateY(-1px);
+  }
+  /* apple-card — used by settings page */
+  .apple-card {
+    @apply sp-card;
   }
 
   /* ── Buttons ── */
   .sp-btn {
     @apply inline-flex items-center justify-center gap-2
-           rounded-lg px-3.5 py-2 text-sm font-semibold
+           rounded-full px-4 py-2 text-sm font-semibold
            transition-all duration-150 select-none cursor-pointer
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
   .sp-btn-primary {
-    @apply sp-btn bg-indigo-600 text-white
-           hover:bg-indigo-500 active:bg-indigo-700
-           shadow-sm shadow-indigo-600/20;
+    @apply sp-btn text-white;
+    background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
+  .sp-btn-primary:hover { filter: brightness(1.07); }
+  .sp-btn-primary:active { filter: brightness(0.95); transform: scale(0.98); }
   .sp-btn-secondary {
-    @apply sp-btn bg-white text-slate-700 border border-slate-200
-           hover:bg-slate-50 hover:border-slate-300 active:bg-slate-100
-           shadow-sm;
+    @apply sp-btn text-slate-700;
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   }
+  .sp-btn-secondary:hover { background: rgba(255, 255, 255, 0.9); }
   .sp-btn-ghost {
-    @apply sp-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+    @apply sp-btn text-slate-600 hover:bg-slate-900/5 hover:text-slate-900;
   }
   .sp-btn-danger {
-    @apply sp-btn bg-red-600 text-white hover:bg-red-500 shadow-sm shadow-red-600/20;
+    @apply sp-btn bg-red-500 text-white hover:bg-red-600;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
   }
+  /* apple-btn — used by settings page */
+  .apple-btn-primary   { @apply sp-btn-primary; }
+  .apple-btn-secondary { @apply sp-btn-secondary; }
 
   /* ── Input ── */
   .sp-input {
-    @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2
+    @apply w-full rounded-xl px-3.5 py-2
            text-sm text-slate-900 placeholder:text-slate-400
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/30
-           focus:border-indigo-400 transition-all;
+           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.28);
   }
+  .sp-input:focus { background: #fff; border-color: rgba(99, 102, 241, 0.5); }
   .sp-select {
-    @apply w-auto rounded-lg border border-slate-200 bg-white px-3 py-2
+    @apply w-auto rounded-xl px-3.5 py-2
            text-sm text-slate-700 cursor-pointer
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/30
-           focus:border-indigo-400 transition-all;
+           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.28);
   }
 
   /* ── Nav item (sidebar) ── */
   .sp-nav {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2
-           text-[13px] font-medium text-slate-400
-           hover:text-white hover:bg-white/10
+    @apply flex items-center gap-3 rounded-xl px-3 py-2
+           text-[13px] font-medium text-slate-500
+           hover:text-slate-900 hover:bg-slate-900/5
            transition-colors duration-100 cursor-pointer;
   }
   .sp-nav-active {
-    @apply text-white bg-indigo-600/90 hover:bg-indigo-600/90
-           shadow-sm shadow-indigo-900/40;
+    @apply text-indigo-600;
+    background: rgba(99, 102, 241, 0.12);
   }
 
   /* ── Badges ── */
@@ -168,8 +213,11 @@
   /* ── Page header (top bar of each page) ── */
   .page-header {
     @apply flex items-center justify-between gap-4
-           px-6 py-4 bg-white border-b border-slate-200/80
-           md:px-8;
+           px-6 py-4 md:px-8;
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    backdrop-filter: blur(20px) saturate(170%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
   }
   .page-title {
     @apply text-lg font-bold text-slate-900 tracking-tight;
@@ -181,13 +229,16 @@
   /* ── Filter bar ── */
   .filter-bar {
     @apply flex flex-wrap items-center gap-2
-           px-6 md:px-8 py-3
-           bg-white border-b border-slate-200/60;
+           px-6 md:px-8 py-3;
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   /* ── Fade in animation ── */
   .fade-in {
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.25s ease-out;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
@@ -196,7 +247,7 @@
 
   /* ── Slide in (for panels) ── */
   .slide-in {
-    animation: slideIn 0.2s ease-out;
+    animation: slideIn 0.25s ease-out;
   }
   @keyframes slideIn {
     from { opacity: 0; transform: translateX(12px); }
@@ -204,17 +255,34 @@
   }
 }
 
+/* ── Legacy overrides: ให้ glass ชนะ bg-white ที่ฝังอยู่ในแต่ละหน้า ── */
+.page-header.bg-white {
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+.filter-bar.bg-white {
+  background: rgba(255, 255, 255, 0.45) !important;
+}
+.sp-card.bg-white {
+  background: rgba(var(--glass-bg) / var(--glass-alpha)) !important;
+}
+/* bg-card sections (charts ฯลฯ) → glass */
+.bg-card {
+  background: rgba(var(--glass-bg) / var(--glass-alpha)) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   DARK MODE
+   DARK MODE — liquid glass on deep slate
 ═══════════════════════════════════════════════════════════════ */
 .dark {
-  --background:      222 47% 8%;    /* #0f172a */
-  --foreground:      210 40% 92%;   /* #e2e8f0 */
-  --card:            222 47% 11%;   /* #1e293b */
+  --background:      222 47% 8%;
+  --foreground:      210 40% 92%;
+  --card:            222 47% 11%;
   --card-foreground: 210 40% 92%;
-  --muted:           217 33% 17%;   /* #1e293b */
-  --muted-foreground:215 20% 55%;   /* #64748b */
-  --border:          217 33% 17%;   /* #1e293b */
+  --muted:           217 33% 17%;
+  --muted-foreground:215 20% 55%;
+  --border:          217 33% 17%;
   --input:           217 33% 17%;
   --accent:          224 64% 15%;
   --accent-foreground: 239 84% 75%;
@@ -222,4 +290,31 @@
   --popover-foreground: 210 40% 92%;
   --secondary:       217 33% 17%;
   --secondary-foreground: 210 40% 92%;
+
+  --glass-bg:        15 23 42;
+  --glass-alpha:     0.55;
+  --glass-border:    rgba(255, 255, 255, 0.08);
+  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.45);
+}
+.dark body {
+  background-color: #0b1020;
+  background-image:
+    radial-gradient(1100px 600px at 8% -10%,  rgba(99, 102, 241, 0.18), transparent 60%),
+    radial-gradient(900px 500px  at 100% 0%,  rgba(56, 189, 248, 0.10), transparent 55%),
+    radial-gradient(900px 600px  at 50% 110%, rgba(168, 85, 247, 0.12), transparent 55%);
+  background-attachment: fixed;
+}
+.dark .sp-input, .dark .sp-select {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+.dark .page-header, .dark .filter-bar {
+  background: rgba(15, 23, 42, 0.55);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+.dark .sp-btn-secondary {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
 }

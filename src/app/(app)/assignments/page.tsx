@@ -129,7 +129,7 @@ export default function CustodySurveyPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-100">
+    <div className="flex flex-col h-full">
       {ConfirmUI}
 
       {/* Header */}

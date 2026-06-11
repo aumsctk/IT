@@ -58,7 +58,7 @@ export default function EmployeesPage() {
   const hasFilter = search || pos !== "all" || status !== "all";
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-slate-100">
+    <div className="flex h-full flex-col overflow-hidden">
 
       {/* Header */}
       <div className="page-header bg-white">
@@ -102,7 +102,7 @@ export default function EmployeesPage() {
         {/* Table */}
         <div className="flex-1 overflow-auto sp-card">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
+            <thead className="bg-white/75 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-10">
               <tr>
                 <th className="th w-14" />
                 <th className="th">{isTh ? "รหัส / ชื่อ" : "Code / Name"}</th>

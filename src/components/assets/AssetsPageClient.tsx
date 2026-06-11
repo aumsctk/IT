@@ -63,7 +63,7 @@ export function AssetsPageClient() {
   const clearFilters = () => { setSearch(""); setStatus(""); setCategory(""); setBranchId(""); };
 
   return (
-    <div className="flex flex-col h-full bg-slate-100">
+    <div className="flex flex-col h-full">
 
       {/* Header */}
       <div className="page-header bg-white">
