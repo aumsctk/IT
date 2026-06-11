@@ -66,17 +66,20 @@ export function AppShell({ children, userRole = "general_user" }: AppShellProps)
     { label: t(tr.nav.settings),  href: "/settings",   icon: Settings,       roles: ["super_admin"] },
   ];
 
-  const mobileNavItems = [
-    { label: t(tr.nav.home),    href: "/dashboard",  icon: LayoutDashboard },
-    { label: t(tr.nav.assets),  href: "/assets",     icon: Package         },
-    { label: t(tr.nav.scan),    href: "/scan",       icon: ScanLine        },
-    { label: t(tr.nav.tickets), href: "/tickets",    icon: Ticket          },
-    { label: t(tr.nav.map),     href: "/floor-plan", icon: Map             },
-  ];
-
   const visibleNavItems = NAV_ITEMS.filter(
     (item) => !(item as any).roles || (item as any).roles.includes(userRole)
   );
+
+  // เมนูล่างมือถือ = ชุดเดียวกับ sidebar + ปุ่มสแกนแทรกตรงกลาง
+  const mobileNavItems = (() => {
+    const items = visibleNavItems.map(i => ({ label: i.label, href: i.href, icon: i.icon }));
+    const mid = Math.ceil(items.length / 2);
+    return [
+      ...items.slice(0, mid),
+      { label: t(tr.nav.scan), href: "/scan", icon: ScanLine },
+      ...items.slice(mid),
+    ];
+  })();
 
   const SidebarContent = () => (
     <div className="flex flex-col flex-1 overflow-hidden">
