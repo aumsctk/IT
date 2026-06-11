@@ -1,4 +1,4 @@
-# push.ps1 — commit ทุกการเปลี่ยนแปลงแล้ว push ขึ้น GitHub
+# push.ps1 — commit ทุกการเปลี่ยนแปลงแล้ว push ขึ้น GitHub (v2)
 # วิธีใช้:  push.bat "ข้อความ commit"   (ถ้าไม่ใส่ จะใช้ "update")
 param([string]$m = "update")
 
