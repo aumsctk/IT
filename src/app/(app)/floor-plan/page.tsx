@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { employeeDB, assetDB, ticketDB } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { SEED_FLOORS, SEED_FLOORPLAN } from "@/lib/seed/plan2569";
 
 // ── Types ──────────────────────────────────────────────────────────
 type SeatStatus = "vacant"|"occupied"|"maintenance"|"broken";
@@ -34,14 +35,10 @@ const SNAP = 10;
 const snap = (v:number) => Math.round(v/SNAP)*SNAP;
 const uid  = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
-// ── Initial data ───────────────────────────────────────────────────
-const FLOORPLAN_VERSION = "v2";
-const INIT_FLOORS: Floor[] = [
-  { id:"fl1", label:"ศูนย์ฯนครราชสีมา" },
-];
-const INIT_DATA: Record<string,FloorData> = {
-  fl1: { zones: [], seats: [] },
-};
+// ── Initial data (จากไฟล์ ผังคอม 2569.xlsx) ────────────────────────
+const FLOORPLAN_VERSION = "v3-plan2569";
+const INIT_FLOORS: Floor[] = SEED_FLOORS;
+const INIT_DATA: Record<string,FloorData> = SEED_FLOORPLAN as Record<string,FloorData>;
 
 // ── Asset icon from registered category ───────────────────────────
 const CATEGORY_ICON: Record<string,string> = {
