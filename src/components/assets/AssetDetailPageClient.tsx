@@ -78,7 +78,12 @@ export function AssetDetailPageClient({ asset: initialAsset }: { asset: Asset })
   const cfg    = STATUS_CFG[asset.status];
   const fmtDate = (d?: string | null) => {
     if (!d) return "-";
-    try { return format(new Date(d), "d MMM yyyy", { locale: isTh ? thLocale : undefined }); }
+    try {
+      const dt = new Date(d);
+      return isTh
+        ? dt.toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })
+        : format(dt, "d MMM yyyy");
+    }
     catch { return d; }
   };
 

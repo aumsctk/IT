@@ -140,11 +140,15 @@ export function AssetTable({ assets }: { assets: Asset[] }) {
                   {wDate ? (
                     <div>
                       <p className={cn("text-xs font-medium", isExpired ? "text-red-600" : isSoon ? "text-amber-600" : "text-slate-500")}>
-                        {isTh ? format(wDate, "d MMM yy", { locale: th }) : format(wDate, "d MMM yy")}
+                        {isTh
+                          ? wDate.toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })
+                          : format(wDate, "d MMM yyyy")}
                       </p>
                       {(isExpired || isSoon) && (
                         <p className={cn("text-[10px] font-semibold mt-0.5", isExpired ? "text-red-500" : "text-amber-500")}>
-                          {isExpired ? `${Math.abs(wDays!)}d overdue` : `${wDays}d left`}
+                          {isExpired
+                            ? (isTh ? `หมดประกันมา ${Math.abs(wDays!)} วัน` : `${Math.abs(wDays!)}d overdue`)
+                            : (isTh ? `เหลืออีก ${wDays} วัน` : `${wDays}d left`)}
                         </p>
                       )}
                     </div>
