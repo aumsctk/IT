@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 
 interface Props {
-  kpi:             Record<string, number>;
+  kpi:             Record<string, number> & { assetTrend?: string | null };
   warrantyTimeline:any[];
   byCategory:      any[];
   byStatus:        any[];
