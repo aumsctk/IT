@@ -3,10 +3,10 @@
 import React from "react";
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Search, UserPlus, X, Phone, Building2, Briefcase, MapPin, Hash } from "lucide-react";
+import { Search, UserPlus, X, Phone, Briefcase, Hash } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { employeeDB, type Employee } from "@/lib/supabaseDB";
-import { getDepartments } from "@/lib/mock/employees";
+import { getPositions } from "@/lib/mock/employees";
 import { cn } from "@/lib/utils";
 
 const STATUS_LABEL: Record<string, Record<string, string>> = {
@@ -32,13 +32,13 @@ export default function EmployeesPage() {
   const isTh = locale === "th";
   const [employees, setEmployees]     = useState<Employee[]>([]);
   const [search, setSearch]           = useState("");
-  const [dept, setDept]               = useState("all");
+  const [pos, setPos]                 = useState("all");
   const [status, setStatus]           = useState("all");
   const [selected, setSelected]       = useState<Employee | null>(null);
-  const [departments, setDepartments] = useState<string[]>([]);
+  const [positions, setPositions]     = useState<string[]>([]);
 
   useEffect(() => {
-    setDepartments(getDepartments());
+    setPositions(getPositions());
     const load = () => { employeeDB.getAll().then(setEmployees); };
     load();
     window.addEventListener("itam_employees_updated", load);
@@ -49,13 +49,13 @@ export default function EmployeesPage() {
     employees.filter(e => {
       const q = search.toLowerCase();
       if (q && !(`${e.emp_code} ${e.full_name ?? ""} ${e.position ?? ""}`).toLowerCase().includes(q)) return false;
-      if (dept !== "all" && e.department !== dept) return false;
+      if (pos !== "all" && e.position !== pos) return false;
       if (status !== "all" && e.status !== status) return false;
       return true;
     }).sort((a, b) => (a.emp_code ?? "").localeCompare(b.emp_code ?? ""))
-  , [employees, search, dept, status]);
+  , [employees, search, pos, status]);
 
-  const hasFilter = search || dept !== "all" || status !== "all";
+  const hasFilter = search || pos !== "all" || status !== "all";
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-slate-100">
@@ -80,16 +80,16 @@ export default function EmployeesPage() {
             placeholder={isTh ? "ค้นหารหัส / ชื่อ / ตำแหน่ง..." : "Search code / name / position..."}
             className="sp-input pl-8" />
         </div>
-        <select value={dept} onChange={e => setDept(e.target.value)} className="sp-select">
-          <option value="all">{isTh ? "ทุกแผนก" : "All Depts"}</option>
-          {departments.map(d => <option key={d} value={d}>{d}</option>)}
+        <select value={pos} onChange={e => setPos(e.target.value)} className="sp-select">
+          <option value="all">{isTh ? "ทุกตำแหน่ง" : "All Positions"}</option>
+          {positions.map(d => <option key={d} value={d}>{d}</option>)}
         </select>
         <select value={status} onChange={e => setStatus(e.target.value)} className="sp-select">
           <option value="all">{isTh ? "ทุกสถานะ" : "All Status"}</option>
           {Object.entries(STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v[locale] ?? v.en}</option>)}
         </select>
         {hasFilter && (
-          <button onClick={() => { setSearch(""); setDept("all"); setStatus("all"); }}
+          <button onClick={() => { setSearch(""); setPos("all"); setStatus("all"); }}
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 transition-colors">
             <X size={11} /> {isTh ? "ล้าง" : "Clear"}
           </button>
@@ -106,7 +106,6 @@ export default function EmployeesPage() {
               <tr>
                 <th className="th w-14" />
                 <th className="th">{isTh ? "รหัส / ชื่อ" : "Code / Name"}</th>
-                <th className="th hidden md:table-cell">{isTh ? "แผนก" : "Department"}</th>
                 <th className="th hidden sm:table-cell">{isTh ? "ตำแหน่ง" : "Position"}</th>
                 <th className="th">{isTh ? "สถานะ" : "Status"}</th>
                 <th className="w-16" />
@@ -114,7 +113,7 @@ export default function EmployeesPage() {
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={6}>
+                <tr><td colSpan={5}>
                   <div className="flex flex-col items-center justify-center py-20 gap-2 text-slate-400">
                     <Search size={24} strokeWidth={1.5} />
                     <p className="text-sm font-medium">{isTh ? "ไม่พบข้อมูลพนักงาน" : "No employees found"}</p>
@@ -137,9 +136,6 @@ export default function EmployeesPage() {
                         {emp.full_name}
                       </p>
                       <p className="text-[10px] text-slate-400 font-mono mt-0.5">{emp.emp_code}</p>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-sm text-slate-500">{emp.department ?? "-"}</span>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <span className="text-sm text-slate-500">{emp.position ?? "-"}</span>
@@ -183,9 +179,7 @@ export default function EmployeesPage() {
             </div>
             <div className="px-5 flex-1">
               <InfoRow icon={Hash}      label={isTh ? "รหัสพนักงาน" : "Employee Code"} value={selected.emp_code ?? "-"} mono />
-              <InfoRow icon={Building2} label={isTh ? "แผนก" : "Department"}           value={selected.department ?? "-"} />
               <InfoRow icon={Briefcase} label={isTh ? "ตำแหน่ง" : "Position"}          value={selected.position ?? "-"} />
-              <InfoRow icon={MapPin}    label={isTh ? "ศูนย์" : "Branch"}              value={selected.branch ?? "-"} />
               {selected.phone && <InfoRow icon={Phone} label={isTh ? "โทรศัพท์" : "Phone"} value={selected.phone} />}
             </div>
             <div className="px-5 pb-5 pt-4">

@@ -198,6 +198,24 @@ export function saveDepartments(list: string[]): void {
   try { localStorage.setItem("itam_departments", JSON.stringify(list)); } catch {}
 }
 
+const DEFAULT_POSITIONS = [
+  "ผู้จัดการ",
+  "หัวหน้างาน",
+  "เจ้าหน้าที่",
+];
+
+export function getPositions(): string[] {
+  if (typeof window === "undefined") return DEFAULT_POSITIONS;
+  try {
+    const stored = localStorage.getItem("itam_positions");
+    return stored ? JSON.parse(stored) : DEFAULT_POSITIONS;
+  } catch { return DEFAULT_POSITIONS; }
+}
+
+export function savePositions(list: string[]): void {
+  try { localStorage.setItem("itam_positions", JSON.stringify(list)); } catch {}
+}
+
 // Keep for backward compat
 export const DEPARTMENTS = DEFAULT_DEPARTMENTS;
 

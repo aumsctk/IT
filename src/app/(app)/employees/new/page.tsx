@@ -7,7 +7,7 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { employeeDB } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { getDepartments, saveDepartments } from "@/lib/mock/employees";
+import { getPositions, savePositions } from "@/lib/mock/employees";
 
 const STATUS_OPTS = [
   { value: "active",   th: "ทำงานอยู่", en: "Active"   },
@@ -35,11 +35,11 @@ export default function NewEmployeePage() {
   const router = useRouter();
   const { confirm, ConfirmUI } = useConfirm();
 
-  const [departments, setDepartments] = useState<string[]>([]);
-  const [newDept, setNewDept] = useState("");
-  const [showAddDept, setShowAddDept] = useState(false);
+  const [positions, setPositions] = useState<string[]>([]);
+  const [newPos, setNewPos] = useState("");
+  const [showAddPos, setShowAddPos] = useState(false);
 
-  useEffect(() => { setDepartments(getDepartments()); }, []);
+  useEffect(() => { setPositions(getPositions()); }, []);
 
   const [form, setForm] = useState({
     emp_code:   "",
@@ -61,22 +61,22 @@ export default function NewEmployeePage() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(p => ({ ...p, [k]: e.target.value }));
 
-  function addDept() {
-    const d = newDept.trim();
-    if (!d || departments.includes(d)) return;
-    const updated = [...departments, d];
-    setDepartments(updated);
-    saveDepartments(updated);
-    setForm(p => ({ ...p, department: d }));
-    setNewDept("");
-    setShowAddDept(false);
+  function addPos() {
+    const d = newPos.trim();
+    if (!d || positions.includes(d)) return;
+    const updated = [...positions, d];
+    setPositions(updated);
+    savePositions(updated);
+    setForm(p => ({ ...p, position: d }));
+    setNewPos("");
+    setShowAddPos(false);
   }
 
-  async function removeDept(d: string) {
-    const updated = departments.filter(x => x !== d);
-    setDepartments(updated);
-    saveDepartments(updated);
-    if (form.department === d) setForm(p => ({ ...p, department: "" }));
+  async function removePos(d: string) {
+    const updated = positions.filter(x => x !== d);
+    setPositions(updated);
+    savePositions(updated);
+    if (form.position === d) setForm(p => ({ ...p, position: "" }));
   }
 
   async function handleSave() {
@@ -134,48 +134,40 @@ export default function NewEmployeePage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-sm font-semibold text-gray-700 border-b pb-1">{isTh ? "ตำแหน่ง / แผนก" : "Position / Department"}</h2>
+            <h2 className="text-sm font-semibold text-gray-700 border-b pb-1">{isTh ? "ตำแหน่ง" : "Position"}</h2>
 
-            {/* Department with add/remove */}
-            <Field label={isTh ? "แผนก" : "Department"}>
+            {/* Position with add/remove */}
+            <Field label={isTh ? "ตำแหน่ง" : "Position"}>
               <div className="space-y-2">
-                <select value={form.department} onChange={set("department")} className={inp()}>
-                  <option value="">{isTh ? "-- เลือกแผนก --" : "-- Select --"}</option>
-                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                <select value={form.position} onChange={set("position")} className={inp()}>
+                  <option value="">{isTh ? "-- เลือกตำแหน่ง --" : "-- Select --"}</option>
+                  {positions.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
-                {/* Dept management */}
+                {/* Position management */}
                 <div className="flex flex-wrap gap-1.5">
-                  {departments.map(d => (
+                  {positions.map(d => (
                     <span key={d} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 text-indigo-700 px-2.5 py-0.5 text-xs">
                       {d}
-                      <button onClick={() => removeDept(d)} className="hover:text-red-500 transition-colors"><X size={10}/></button>
+                      <button onClick={() => removePos(d)} className="hover:text-red-500 transition-colors"><X size={10}/></button>
                     </span>
                   ))}
-                  {showAddDept ? (
+                  {showAddPos ? (
                     <div className="flex items-center gap-1">
-                      <input value={newDept} onChange={e => setNewDept(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && addDept()}
-                        placeholder={isTh ? "ชื่อแผนก..." : "Dept name..."}
+                      <input value={newPos} onChange={e => setNewPos(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && addPos()}
+                        placeholder={isTh ? "ชื่อตำแหน่ง..." : "Position name..."}
                         autoFocus
                         className="text-xs border rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-indigo-300 w-32" />
-                      <button onClick={addDept} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">{isTh ? "เพิ่ม" : "Add"}</button>
-                      <button onClick={() => setShowAddDept(false)} className="text-xs text-gray-400 hover:text-gray-600">{isTh ? "ยกเลิก" : "Cancel"}</button>
+                      <button onClick={addPos} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">{isTh ? "เพิ่ม" : "Add"}</button>
+                      <button onClick={() => setShowAddPos(false)} className="text-xs text-gray-400 hover:text-gray-600">{isTh ? "ยกเลิก" : "Cancel"}</button>
                     </div>
                   ) : (
-                    <button onClick={() => setShowAddDept(true)} className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800">
-                      <Plus size={11}/>{isTh ? "เพิ่มแผนก" : "Add dept"}
+                    <button onClick={() => setShowAddPos(true)} className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800">
+                      <Plus size={11}/>{isTh ? "เพิ่มตำแหน่ง" : "Add position"}
                     </button>
                   )}
                 </div>
               </div>
-            </Field>
-
-            <Field label={isTh ? "ตำแหน่ง" : "Position"}>
-              <input value={form.position} onChange={set("position")} placeholder={isTh ? "ผู้จัดการ IT" : "IT Manager"} className={inp()} />
-            </Field>
-
-            <Field label={isTh ? "ศูนย์" : "Center"}>
-              <input value={CENTER} disabled className={inp() + " bg-gray-50 text-gray-500 cursor-not-allowed"} />
             </Field>
           </section>
 
