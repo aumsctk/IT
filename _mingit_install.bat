@@ -1,2 +1,0 @@
-@echo off
-start "" powershell -ExecutionPolicy Bypass -Command "& { $url='https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/MinGit-2.45.2-64-bit.zip'; $out=$env:TEMP+'\mingit.zip'; Write-Host 'Downloading MinGit...'; Invoke-WebRequest $url -OutFile $out -UseBasicParsing; Write-Host 'Extracting...'; Expand-Archive $out -DestinationPath '%~dp0.mingit' -Force; Write-Host 'Done! MinGit ready at %~dp0.mingit'; Start-Sleep 3 }"
