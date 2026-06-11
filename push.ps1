@@ -7,8 +7,12 @@ $env:PATH = "$PSScriptRoot\.mingit\cmd;$PSScriptRoot\.mingit\bin;" + $env:PATH
 
 git add -A
 git commit -m $m
-git push origin main 2>&1
-
-Write-Host ""
-Write-Host "=== Done ===" -ForegroundColor Green
-git log --oneline -3
+git push origin main
+if ($LASTEXITCODE -eq 0) {
+    Write-Host ""
+    Write-Host "=== Push สำเร็จ ===" -ForegroundColor Green
+} else {
+    Write-Host ""
+    Write-Host "=== Push ล้มเหลว (ดูข้อความด้านบน) ===" -ForegroundColor Red
+}
+git --no-pager log --oneline -3
