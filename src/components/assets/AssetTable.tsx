@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { MapPin, Monitor, Laptop2, Printer, Router, BatteryCharging, Keyboard, HardDrive, MonitorDot, Box, ChevronRight } from "lucide-react";
@@ -48,6 +49,7 @@ const CAT_ICON: Record<string, { Icon: React.ElementType; bg: string; fg: string
 
 export function AssetTable({ assets }: { assets: Asset[] }) {
   const { locale } = useLanguage();
+  const router = useRouter();
   const isTh = locale === "th";
 
   if (assets.length === 0) {
@@ -86,7 +88,8 @@ export function AssetTable({ assets }: { assets: Asset[] }) {
 
             return (
               <tr key={asset.id}
-                className="border-b border-slate-100 hover:bg-indigo-50/40 transition-colors duration-100 group">
+                className="border-b border-slate-100 hover:bg-indigo-50/40 transition-colors duration-100 group cursor-pointer"
+                onClick={() => router.push(`/assets/${asset.id}`)}>
 
                 <td className="pl-4 pr-2 py-3">
                   <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center shrink-0", iconCfg.bg)}>

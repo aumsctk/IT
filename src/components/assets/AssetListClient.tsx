@@ -193,6 +193,7 @@ function AssetRowItem({
   locale: string;
   L: Record<string, string>;
 }) {
+  const router         = useRouter();
   const warrantyDate   = asset.warranty_expiry ? new Date(asset.warranty_expiry) : null;
   const isExpired      = warrantyDate ? warrantyDate < new Date() : false;
   const isExpiringSoon = warrantyDate
@@ -200,7 +201,10 @@ function AssetRowItem({
     : false;
 
   return (
-    <tr className="hover:bg-accent/30 transition-colors group">
+    <tr
+      className="hover:bg-accent/30 transition-colors group cursor-pointer"
+      onClick={() => router.push(`/assets/${asset.id}`)}
+    >
       <td className="px-3 py-3">
         <div className="h-9 w-9 rounded-md bg-muted overflow-hidden">
           {asset.asset_models?.image_url ? (
