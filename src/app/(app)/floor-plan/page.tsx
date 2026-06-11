@@ -36,7 +36,7 @@ const snap = (v:number) => Math.round(v/SNAP)*SNAP;
 const uid  = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 // ── Initial data (จากไฟล์ ผังคอม 2569.xlsx) ────────────────────────
-const FLOORPLAN_VERSION = "v3-plan2569";
+const FLOORPLAN_VERSION = "v4-plan2569-areas";
 const INIT_FLOORS: Floor[] = SEED_FLOORS;
 const INIT_DATA: Record<string,FloorData> = SEED_FLOORPLAN as Record<string,FloorData>;
 
@@ -90,7 +90,7 @@ export default function FloorPlanPage() {
 
   const [floors,     setFloors]     = useState<Floor[]>(INIT_FLOORS);
   const [floorData,  setFloorData]  = useState<Record<string,FloorData>>(INIT_DATA);
-  const [currentId,  setCurrentId]  = useState("fl1");
+  const [currentId,  setCurrentId]  = useState(INIT_FLOORS[0]?.id ?? "fl1");
   const [selected,   setSelected]   = useState<Seat|null>(null);
   const [editModal,  setEditModal]  = useState<Seat|null>(null);
   const [zoneModal,  setZoneModal]  = useState<Zone|null|"new">(null);
@@ -120,7 +120,7 @@ export default function FloorPlanPage() {
         localStorage.setItem("floorplan_version", FLOORPLAN_VERSION);
         setFloors(INIT_FLOORS);
         setFloorData(INIT_DATA);
-        setCurrentId("fl1");
+        setCurrentId(INIT_FLOORS[0]?.id ?? "fl1");
       } else {
         const f = localStorage.getItem("floorplan_floors");   if (f) setFloors(JSON.parse(f));
         const d = localStorage.getItem("floorplan_data");     if (d) setFloorData(JSON.parse(d));

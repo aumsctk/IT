@@ -1,4 +1,5 @@
 // Auto-generated from ผังคอม 2569.xlsx — seed data for assets + floor plan
+// แต่ละชีทในไฟล์ = พื้นที่ของตัวเอง (5 พื้นที่)
 // สร้างโดยสคริปต์ ห้ามแก้มือ (regenerate ได้)
 
 export type SeedAsset = {
@@ -2135,53 +2136,44 @@ export const SEED_ASSETS: SeedAsset[] = [
 ];
 
 export const SEED_FLOORS = [
-  { id: "fl1", label: "ชั้น 1" },
-  { id: "fl2", label: "ชั้น 2 (เต็กฮะ)" },
+  {
+    "id": "fl_front",
+    "label": "หน้าร้าน"
+  },
+  {
+    "id": "fl_acc",
+    "label": "บัญชี-การเงิน"
+  },
+  {
+    "id": "fl_vcall",
+    "label": "Vcall"
+  },
+  {
+    "id": "fl_non",
+    "label": "NON ทะเบียนสินไหม"
+  },
+  {
+    "id": "fl_tekha",
+    "label": "สำนักงานเต็กฮะ"
+  }
 ];
 
 export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
-  "fl1": {
+  "fl_front": {
     "zones": [
       {
-        "id": "z1",
+        "id": "z_fl_front",
         "label": "หน้าร้าน",
         "x": 40,
         "y": 40,
         "w": 940,
         "h": 960,
         "color": "#eff6ff"
-      },
-      {
-        "id": "z2",
-        "label": "บัญชี-การเงิน",
-        "x": 40,
-        "y": 1080,
-        "w": 810,
-        "h": 510,
-        "color": "#f0fdf4"
-      },
-      {
-        "id": "z3",
-        "label": "Vcall",
-        "x": 1390,
-        "y": 40,
-        "w": 550,
-        "h": 810,
-        "color": "#fdf4ff"
-      },
-      {
-        "id": "z4",
-        "label": "NON ทะเบียนสินไหม",
-        "x": 1040,
-        "y": 40,
-        "w": 290,
-        "h": 960,
-        "color": "#fff7ed"
       }
     ],
     "seats": [
       {
-        "id": "s_fl1_A2_1",
+        "id": "s_fl_front_A2",
         "label": "สคส.1 หน้าร้าน",
         "x": 60,
         "y": 85,
@@ -2195,7 +2187,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "34"
       },
       {
-        "id": "s_fl1_A8_1",
+        "id": "s_fl_front_A8",
         "label": "สคส.4 (นุ่ย)",
         "x": 60,
         "y": 235,
@@ -2210,7 +2202,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "54"
       },
       {
-        "id": "s_fl1_A13_1",
+        "id": "s_fl_front_A13",
         "label": "สคส.7 (สัน)",
         "x": 60,
         "y": 385,
@@ -2225,7 +2217,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "53"
       },
       {
-        "id": "s_fl1_A19_1",
+        "id": "s_fl_front_A19",
         "label": "สคส.4 (โน็ต)",
         "x": 60,
         "y": 535,
@@ -2241,7 +2233,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "47"
       },
       {
-        "id": "s_fl1_A24_1",
+        "id": "s_fl_front_A24",
         "label": "สคส.7 (เหน่ง)",
         "x": 60,
         "y": 685,
@@ -2256,7 +2248,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "48"
       },
       {
-        "id": "s_fl1_B2_1",
+        "id": "s_fl_front_B2",
         "label": "สคส.2 หน้าร้าน",
         "x": 190,
         "y": 85,
@@ -2270,7 +2262,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "33"
       },
       {
-        "id": "s_fl1_B8_1",
+        "id": "s_fl_front_B8",
         "label": "สคส.5 (บูม)",
         "x": 190,
         "y": 235,
@@ -2285,7 +2277,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "56"
       },
       {
-        "id": "s_fl1_B13_1",
+        "id": "s_fl_front_B13",
         "label": "สคส.8 (วุต)",
         "x": 190,
         "y": 385,
@@ -2300,7 +2292,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "55"
       },
       {
-        "id": "s_fl1_B19_1",
+        "id": "s_fl_front_B19",
         "label": "สคส.5 (เอ็ม)",
         "x": 190,
         "y": 535,
@@ -2315,7 +2307,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "46"
       },
       {
-        "id": "s_fl1_B24_1",
+        "id": "s_fl_front_B24",
         "label": "สคส.8 (บอย)",
         "x": 190,
         "y": 685,
@@ -2331,7 +2323,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "45"
       },
       {
-        "id": "s_fl1_C2_1",
+        "id": "s_fl_front_C2",
         "label": "สคส.3 หน้าร้าน",
         "x": 320,
         "y": 85,
@@ -2345,7 +2337,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "57"
       },
       {
-        "id": "s_fl1_C8_1",
+        "id": "s_fl_front_C8",
         "label": "สคส.6 (นคร)",
         "x": 320,
         "y": 235,
@@ -2360,7 +2352,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "50"
       },
       {
-        "id": "s_fl1_C13_1",
+        "id": "s_fl_front_C13",
         "label": "สคส.9 (ป๋อง)",
         "x": 320,
         "y": 385,
@@ -2375,7 +2367,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "49"
       },
       {
-        "id": "s_fl1_C19_1",
+        "id": "s_fl_front_C19",
         "label": "สคส.6 (เอกรัก)",
         "x": 320,
         "y": 535,
@@ -2390,7 +2382,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "52"
       },
       {
-        "id": "s_fl1_C24_1",
+        "id": "s_fl_front_C24",
         "label": "สคส.9 (เม)",
         "x": 320,
         "y": 685,
@@ -2405,7 +2397,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "51"
       },
       {
-        "id": "s_fl1_C30_1",
+        "id": "s_fl_front_C30",
         "label": "ผจก. ศูนย์",
         "x": 320,
         "y": 835,
@@ -2419,7 +2411,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "66"
       },
       {
-        "id": "s_fl1_E2_1",
+        "id": "s_fl_front_E2",
         "label": "อบ.1 หน้าร้าน",
         "x": 580,
         "y": 85,
@@ -2433,7 +2425,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "63"
       },
       {
-        "id": "s_fl1_E8_1",
+        "id": "s_fl_front_E8",
         "label": "อบ.4",
         "x": 580,
         "y": 235,
@@ -2447,7 +2439,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "58"
       },
       {
-        "id": "s_fl1_E13_1",
+        "id": "s_fl_front_E13",
         "label": "หนช.1",
         "x": 580,
         "y": 385,
@@ -2461,7 +2453,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "14"
       },
       {
-        "id": "s_fl1_F2_1",
+        "id": "s_fl_front_F2",
         "label": "อบ.2 หน้าร้าน",
         "x": 710,
         "y": 85,
@@ -2475,7 +2467,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "62"
       },
       {
-        "id": "s_fl1_F8_1",
+        "id": "s_fl_front_F8",
         "label": "อบ.5",
         "x": 710,
         "y": 235,
@@ -2489,7 +2481,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "60"
       },
       {
-        "id": "s_fl1_F13_1",
+        "id": "s_fl_front_F13",
         "label": "หนช.2",
         "x": 710,
         "y": 385,
@@ -2503,7 +2495,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "68"
       },
       {
-        "id": "s_fl1_G2_1",
+        "id": "s_fl_front_G2",
         "label": "อบ.3 หน้าร้าน",
         "x": 840,
         "y": 85,
@@ -2517,7 +2509,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "64"
       },
       {
-        "id": "s_fl1_G8_1",
+        "id": "s_fl_front_G8",
         "label": "อบ.6",
         "x": 840,
         "y": 235,
@@ -2531,7 +2523,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "59"
       },
       {
-        "id": "s_fl1_G13_1",
+        "id": "s_fl_front_G13",
         "label": "หนช.3",
         "x": 840,
         "y": 385,
@@ -2545,7 +2537,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "69"
       },
       {
-        "id": "s_fl1_G19_1",
+        "id": "s_fl_front_G19",
         "label": "หนส. หน้า (เก่ง)",
         "x": 840,
         "y": 535,
@@ -2560,7 +2552,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "67"
       },
       {
-        "id": "s_fl1_G24_1",
+        "id": "s_fl_front_G24",
         "label": "หนส. หลัง (เกษม)",
         "x": 840,
         "y": 685,
@@ -2573,12 +2565,27 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         ],
         "employee": "เกษม",
         "rj45_port": "65"
-      },
+      }
+    ]
+  },
+  "fl_acc": {
+    "zones": [
       {
-        "id": "s_fl1_A2_2",
+        "id": "z_fl_acc",
+        "label": "บัญชี-การเงิน",
+        "x": 40,
+        "y": 40,
+        "w": 810,
+        "h": 510,
+        "color": "#f0fdf4"
+      }
+    ],
+    "seats": [
+      {
+        "id": "s_fl_acc_A2",
         "label": "การเงิน (จุ๋ม)",
         "x": 60,
-        "y": 1125,
+        "y": 85,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2590,10 +2597,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "1"
       },
       {
-        "id": "s_fl1_A8_2",
+        "id": "s_fl_acc_A8",
         "label": "การเงิน (นุช)",
         "x": 60,
-        "y": 1275,
+        "y": 235,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2605,10 +2612,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "6"
       },
       {
-        "id": "s_fl1_B2_2",
+        "id": "s_fl_acc_B2",
         "label": "การเงิน (แก้ว)",
         "x": 190,
-        "y": 1125,
+        "y": 85,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2620,10 +2627,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "3"
       },
       {
-        "id": "s_fl1_B8_2",
+        "id": "s_fl_acc_B8",
         "label": "การเงิน (แป๋ว)",
         "x": 190,
-        "y": 1275,
+        "y": 235,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2635,10 +2642,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "34"
       },
       {
-        "id": "s_fl1_D2_2",
+        "id": "s_fl_acc_D2",
         "label": "บัญชี (ปิง)",
         "x": 450,
-        "y": 1125,
+        "y": 85,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2650,10 +2657,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "39"
       },
       {
-        "id": "s_fl1_D8_2",
+        "id": "s_fl_acc_D8",
         "label": "บัญชี (แอ๊ะ)",
         "x": 450,
-        "y": 1275,
+        "y": 235,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2665,10 +2672,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "35"
       },
       {
-        "id": "s_fl1_D14_2",
+        "id": "s_fl_acc_D14",
         "label": "สมุห์ (แพน)",
         "x": 450,
-        "y": 1425,
+        "y": 385,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2680,10 +2687,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "44"
       },
       {
-        "id": "s_fl1_E2_2",
+        "id": "s_fl_acc_E2",
         "label": "ว่าง",
         "x": 580,
-        "y": 1125,
+        "y": 85,
         "w": 104,
         "h": 104,
         "status": "vacant",
@@ -2691,10 +2698,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "40"
       },
       {
-        "id": "s_fl1_E8_2",
+        "id": "s_fl_acc_E8",
         "label": "บัญชี (ออน)",
         "x": 580,
-        "y": 1275,
+        "y": 235,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2706,10 +2713,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "36"
       },
       {
-        "id": "s_fl1_F2_2",
+        "id": "s_fl_acc_F2",
         "label": "บัญชี (แจง)",
         "x": 710,
-        "y": 1125,
+        "y": 85,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2721,10 +2728,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "41"
       },
       {
-        "id": "s_fl1_F8_2",
+        "id": "s_fl_acc_F8",
         "label": "บัญชี (นุ้ย)",
         "x": 710,
-        "y": 1275,
+        "y": 235,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2736,10 +2743,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "37"
       },
       {
-        "id": "s_fl1_F14_2",
+        "id": "s_fl_acc_F14",
         "label": "บัญชี (แสด)",
         "x": 710,
-        "y": 1425,
+        "y": 385,
         "w": 104,
         "h": 104,
         "status": "occupied",
@@ -2749,11 +2756,26 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         ],
         "employee": "แสด",
         "rj45_port": "38"
-      },
+      }
+    ]
+  },
+  "fl_vcall": {
+    "zones": [
       {
-        "id": "s_fl1_A2_3",
+        "id": "z_fl_vcall",
+        "label": "Vcall",
+        "x": 40,
+        "y": 40,
+        "w": 550,
+        "h": 810,
+        "color": "#fdf4ff"
+      }
+    ],
+    "seats": [
+      {
+        "id": "s_fl_vcall_A2",
         "label": "อบ V Call (ตั้ม)",
-        "x": 1410,
+        "x": 60,
         "y": 85,
         "w": 104,
         "h": 104,
@@ -2766,9 +2788,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "6"
       },
       {
-        "id": "s_fl1_A14_3",
+        "id": "s_fl_vcall_A14",
         "label": "รับแจ้ง (เกต)",
-        "x": 1410,
+        "x": 60,
         "y": 385,
         "w": 104,
         "h": 104,
@@ -2780,9 +2802,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "เกต"
       },
       {
-        "id": "s_fl1_A19_3",
+        "id": "s_fl_vcall_A19",
         "label": "อบ Node (ตูมตาม)",
-        "x": 1410,
+        "x": 60,
         "y": 535,
         "w": 104,
         "h": 104,
@@ -2795,9 +2817,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "ตูมตาม"
       },
       {
-        "id": "s_fl1_A24_3",
+        "id": "s_fl_vcall_A24",
         "label": "อบ Node (หนึ่ง)",
-        "x": 1410,
+        "x": 60,
         "y": 685,
         "w": 104,
         "h": 104,
@@ -2810,9 +2832,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "หนึ่ง"
       },
       {
-        "id": "s_fl1_B2_3",
+        "id": "s_fl_vcall_B2",
         "label": "อบ V Call (เฟริ์น)",
-        "x": 1540,
+        "x": 190,
         "y": 85,
         "w": 104,
         "h": 104,
@@ -2825,9 +2847,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "5"
       },
       {
-        "id": "s_fl1_B7_3",
+        "id": "s_fl_vcall_B7",
         "label": "อบ V Call (บอม)",
-        "x": 1540,
+        "x": 190,
         "y": 235,
         "w": 104,
         "h": 104,
@@ -2840,9 +2862,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "6"
       },
       {
-        "id": "s_fl1_B14_3",
+        "id": "s_fl_vcall_B14",
         "label": "รับแจ้ง (ปอน)",
-        "x": 1540,
+        "x": 190,
         "y": 385,
         "w": 104,
         "h": 104,
@@ -2854,9 +2876,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "ปอน"
       },
       {
-        "id": "s_fl1_B19_3",
+        "id": "s_fl_vcall_B19",
         "label": "อบ Node (ชัด)",
-        "x": 1540,
+        "x": 190,
         "y": 535,
         "w": 104,
         "h": 104,
@@ -2869,9 +2891,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "ชัด"
       },
       {
-        "id": "s_fl1_B24_3",
+        "id": "s_fl_vcall_B24",
         "label": "อบ Node (กุ้ง)",
-        "x": 1540,
+        "x": 190,
         "y": 685,
         "w": 104,
         "h": 104,
@@ -2884,9 +2906,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "กุ้ง"
       },
       {
-        "id": "s_fl1_D14_3",
+        "id": "s_fl_vcall_D14",
         "label": "หัวหน้าโหนด อบ (อั้น)",
-        "x": 1800,
+        "x": 450,
         "y": 385,
         "w": 104,
         "h": 104,
@@ -2897,11 +2919,26 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
           "68000009"
         ],
         "employee": "อั้น"
-      },
+      }
+    ]
+  },
+  "fl_non": {
+    "zones": [
       {
-        "id": "s_fl1_A2_4",
+        "id": "z_fl_non",
+        "label": "NON ทะเบียนสินไหม",
+        "x": 40,
+        "y": 40,
+        "w": 290,
+        "h": 960,
+        "color": "#fff7ed"
+      }
+    ],
+    "seats": [
+      {
+        "id": "s_fl_non_A2",
         "label": "ชีวิตและร่างกาย (เดียร์)",
-        "x": 1060,
+        "x": 60,
         "y": 85,
         "w": 104,
         "h": 104,
@@ -2914,9 +2951,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "24"
       },
       {
-        "id": "s_fl1_A7_4",
+        "id": "s_fl_non_A7",
         "label": "ชีวิตและร่างกาย (อ้อ)",
-        "x": 1060,
+        "x": 60,
         "y": 235,
         "w": 104,
         "h": 104,
@@ -2929,9 +2966,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "25"
       },
       {
-        "id": "s_fl1_A20_4",
+        "id": "s_fl_non_A20",
         "label": "ทะเบียน (ต่าย)",
-        "x": 1060,
+        "x": 60,
         "y": 535,
         "w": 104,
         "h": 104,
@@ -2944,9 +2981,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "18"
       },
       {
-        "id": "s_fl1_A25_4",
+        "id": "s_fl_non_A25",
         "label": "สารสนเทศ (อุ้ม)",
-        "x": 1060,
+        "x": 60,
         "y": 685,
         "w": 104,
         "h": 104,
@@ -2959,9 +2996,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "22"
       },
       {
-        "id": "s_fl1_A32_4",
+        "id": "s_fl_non_A32",
         "label": "ชำนาญการ (หญิง)",
-        "x": 1060,
+        "x": 60,
         "y": 835,
         "w": 104,
         "h": 104,
@@ -2974,9 +3011,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "17"
       },
       {
-        "id": "s_fl1_B2_4",
+        "id": "s_fl_non_B2",
         "label": "อบ (ยิ่งยง)",
-        "x": 1190,
+        "x": 190,
         "y": 85,
         "w": 104,
         "h": 104,
@@ -2989,9 +3026,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "28"
       },
       {
-        "id": "s_fl1_B7_4",
+        "id": "s_fl_non_B7",
         "label": "พยาบาล",
-        "x": 1190,
+        "x": 190,
         "y": 235,
         "w": 104,
         "h": 104,
@@ -3003,9 +3040,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "27"
       },
       {
-        "id": "s_fl1_B13_4",
+        "id": "s_fl_non_B13",
         "label": "หนส (หนึ่ง)",
-        "x": 1190,
+        "x": 190,
         "y": 385,
         "w": 104,
         "h": 104,
@@ -3018,9 +3055,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "23"
       },
       {
-        "id": "s_fl1_B20_4",
+        "id": "s_fl_non_B20",
         "label": "ทะเบียน (นุ้ย)",
-        "x": 1190,
+        "x": 190,
         "y": 535,
         "w": 104,
         "h": 104,
@@ -3033,9 +3070,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "16"
       },
       {
-        "id": "s_fl1_B25_4",
+        "id": "s_fl_non_B25",
         "label": "ทะเบียน (ฟาง)",
-        "x": 1190,
+        "x": 190,
         "y": 685,
         "w": 104,
         "h": 104,
@@ -3048,9 +3085,9 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "17"
       },
       {
-        "id": "s_fl1_B32_4",
+        "id": "s_fl_non_B32",
         "label": "ชำนาญการ (แมว)",
-        "x": 1190,
+        "x": 190,
         "y": 835,
         "w": 104,
         "h": 104,
@@ -3064,10 +3101,10 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
       }
     ]
   },
-  "fl2": {
+  "fl_tekha": {
     "zones": [
       {
-        "id": "z5",
+        "id": "z_fl_tekha",
         "label": "สำนักงานเต็กฮะ",
         "x": 40,
         "y": 40,
@@ -3078,7 +3115,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
     ],
     "seats": [
       {
-        "id": "s_fl2_C4_5",
+        "id": "s_fl_tekha_C4",
         "label": "กฎหมาย (โอ)",
         "x": 60,
         "y": 85,
@@ -3093,7 +3130,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "1"
       },
       {
-        "id": "s_fl2_C9_5",
+        "id": "s_fl_tekha_C9",
         "label": "กฎหมาย (ล้าน)",
         "x": 60,
         "y": 235,
@@ -3108,7 +3145,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "4"
       },
       {
-        "id": "s_fl2_C14_5",
+        "id": "s_fl_tekha_C14",
         "label": "หนส(พิชิต)",
         "x": 60,
         "y": 685,
@@ -3123,7 +3160,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "5"
       },
       {
-        "id": "s_fl2_C20_5",
+        "id": "s_fl_tekha_C20",
         "label": "นายณรงค์ อภิเมธีธำรง",
         "x": 60,
         "y": 985,
@@ -3138,7 +3175,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "8"
       },
       {
-        "id": "s_fl2_D4_5",
+        "id": "s_fl_tekha_D4",
         "label": "เรียกร้องค่าสินไหม (หนุ่ม)",
         "x": 190,
         "y": 85,
@@ -3153,7 +3190,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "2"
       },
       {
-        "id": "s_fl2_D9_5",
+        "id": "s_fl_tekha_D9",
         "label": "เรียกร้องค่าสินไหม (เล็ก)",
         "x": 190,
         "y": 235,
@@ -3168,7 +3205,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "54"
       },
       {
-        "id": "s_fl2_D14_5",
+        "id": "s_fl_tekha_D14",
         "label": "นางสาวสุวรรณา ลักขษร",
         "x": 190,
         "y": 685,
@@ -3183,7 +3220,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "6"
       },
       {
-        "id": "s_fl2_D20_5",
+        "id": "s_fl_tekha_D20",
         "label": "พี่นัน",
         "x": 190,
         "y": 985,
@@ -3198,7 +3235,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "7"
       },
       {
-        "id": "s_fl2_H4_5",
+        "id": "s_fl_tekha_H4",
         "label": "พี่เอก",
         "x": 450,
         "y": 85,
@@ -3213,7 +3250,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "5"
       },
       {
-        "id": "s_fl2_H9_5",
+        "id": "s_fl_tekha_H9",
         "label": "ว่าง",
         "x": 450,
         "y": 235,
@@ -3223,7 +3260,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "asset_tags": []
       },
       {
-        "id": "s_fl2_H16_5",
+        "id": "s_fl_tekha_H16",
         "label": "หนส. (เล็ก)",
         "x": 450,
         "y": 835,
@@ -3238,7 +3275,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "26"
       },
       {
-        "id": "s_fl2_H21_5",
+        "id": "s_fl_tekha_H21",
         "label": "ว่าง",
         "x": 450,
         "y": 1135,
@@ -3248,7 +3285,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "asset_tags": []
       },
       {
-        "id": "s_fl2_H26_5",
+        "id": "s_fl_tekha_H26",
         "label": "หนส. (อ้วน)",
         "x": 450,
         "y": 1435,
@@ -3263,7 +3300,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "25"
       },
       {
-        "id": "s_fl2_I4_5",
+        "id": "s_fl_tekha_I4",
         "label": "พี่ปุ้ย",
         "x": 580,
         "y": 85,
@@ -3278,7 +3315,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "9"
       },
       {
-        "id": "s_fl2_I9_5",
+        "id": "s_fl_tekha_I9",
         "label": "พี่จวบ",
         "x": 580,
         "y": 235,
@@ -3292,7 +3329,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "พี่จวบ"
       },
       {
-        "id": "s_fl2_I16_5",
+        "id": "s_fl_tekha_I16",
         "label": "ว่าง",
         "x": 580,
         "y": 835,
@@ -3302,7 +3339,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "asset_tags": []
       },
       {
-        "id": "s_fl2_I21_5",
+        "id": "s_fl_tekha_I21",
         "label": "ว่าง",
         "x": 580,
         "y": 1135,
@@ -3312,7 +3349,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "asset_tags": []
       },
       {
-        "id": "s_fl2_I26_5",
+        "id": "s_fl_tekha_I26",
         "label": "ว่าง",
         "x": 580,
         "y": 1435,
@@ -3326,7 +3363,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "17"
       },
       {
-        "id": "s_fl2_M4_5",
+        "id": "s_fl_tekha_M4",
         "label": "ผช. ปิยะ",
         "x": 840,
         "y": 85,
@@ -3341,7 +3378,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "89"
       },
       {
-        "id": "s_fl2_M10_5",
+        "id": "s_fl_tekha_M10",
         "label": "ผช.นิเวศ",
         "x": 840,
         "y": 385,
@@ -3355,7 +3392,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "employee": "ผช.นิเวศ"
       },
       {
-        "id": "s_fl2_M16_5",
+        "id": "s_fl_tekha_M16",
         "label": "รอง. วารี",
         "x": 840,
         "y": 835,
@@ -3370,7 +3407,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "59"
       },
       {
-        "id": "s_fl2_M25_5",
+        "id": "s_fl_tekha_M25",
         "label": "พี่หนุ่ม",
         "x": 840,
         "y": 1285,
@@ -3385,7 +3422,7 @@ export const SEED_FLOORPLAN: Record<string, { zones: any[]; seats: any[] }> = {
         "rj45_port": "27"
       },
       {
-        "id": "s_fl2_R12_5",
+        "id": "s_fl_tekha_R12",
         "label": "Printer (Epson)",
         "x": 1100,
         "y": 535,
