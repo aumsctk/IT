@@ -135,7 +135,7 @@ export function AssetsPageClient() {
       )}
 
       {/* Table wrapper */}
-      <div className="flex-1 overflow-hidden mx-6 my-4 md:mx-8 sp-card">
+      <div className="flex-1 overflow-hidden mx-6 my-4 md:mx-8 sp-card flex flex-col min-h-0">
         <AssetTable assets={filtered} />
       </div>
     </div>
