@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { employeeDB, assetDB, ticketDB } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { SEED_FLOORS, SEED_FLOORPLAN } from "@/lib/seed/plan2569";
+import { SEED_FLOORS, SEED_FLOORPLAN, SEED_ASSETS } from "@/lib/seed/plan2569";
 
 // ── Types ──────────────────────────────────────────────────────────
 type SeatStatus = "vacant"|"occupied"|"maintenance"|"broken";
@@ -62,6 +62,9 @@ const CATEGORY_ICON: Record<string,string> = {
 function categoryIcon(tag: string, assetList: any[] = []): string {
   const asset = assetList.find((a: any) => a.asset_tag === tag);
   if (asset?.category) return CATEGORY_ICON[asset.category] ?? "📦";
+  // fallback: ดูหมวดจากข้อมูลผังคอม 2569
+  const seedCat = SEED_ASSETS.find(s => s.asset_tag === tag)?.category;
+  if (seedCat) return CATEGORY_ICON[seedCat] ?? "📦";
   // fallback: guess from tag prefix
   const t = tag.toUpperCase();
   if (t.includes("NB") || t.includes("LAPTOP")) return "💻";
