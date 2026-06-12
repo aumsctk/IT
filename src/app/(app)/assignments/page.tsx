@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, X, UserCheck, Check, RotateCcw, Pencil, Printer, History, ChevronDown } from "lucide-react";
+import { Search, X, UserCheck, Check, RotateCcw, Pencil, Printer, History, ChevronDown, Trash2, Undo2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { assetDB, employeeDB, type Asset } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -155,27 +155,86 @@ export default function CustodySurveyPage() {
     window.dispatchEvent(new Event("itam_assets_updated"));
   }
 
-  async function closeRound() {
-    if (!current) return;
-    const ok = await confirm({
-      title: isTh
-        ? `ปิดรอบที่ ${current.no} และเริ่มรอบใหม่? ผลรอบนี้จะถูกเก็บไว้ดูย้อนหลังได้`
-        : `Close round ${current.no} and start a new one? Results will be archived`,
-      confirmLabel: isTh ? "ปิดรอบ & เริ่มรอบใหม่" : "Close & Start New",
-    });
-    if (!ok) return;
-    // snapshot รายการทั้งหมด ณ เวลาปิดรอบ
-    const snapshot: RItem[] = assets
+  const makeSnapshot = (results: Record<string, SurveyResult>): RItem[] =>
+    assets
       .filter(a => a.status !== "returned")
       .map(a => ({
         id: a.id, tag: a.asset_tag, category: a.category,
         seat: a.seat_label, room: a.room_name, holder: a.assigned_to_name,
-        result: current.results[a.id],
+        result: results[a.id],
       }));
-    const closed: Round = { ...current, closedAt: new Date().toISOString(), items: snapshot };
+
+  async function closeRound() {
+    if (!current) return;
+    const ok = await confirm({
+      title: isTh
+        ? `ปิดรอบที่ ${current.no} และเริ่มรอบใหม่? ผลรอบนี้จะถูกเก็บไว้ดูย้อนหลังได้ (เปิดกลับมาตรวจต่อได้ภายหลัง)`
+        : `Close round ${current.no} and start a new one? Results will be archived`,
+      confirmLabel: isTh ? "ปิดรอบ & เริ่มรอบใหม่" : "Close & Start New",
+    });
+    if (!ok) return;
+    const closed: Round = { ...current, closedAt: new Date().toISOString(), items: makeSnapshot(current.results) };
     const next: Round = { id: uid(), no: Math.max(...store.rounds.map(r => r.no)) + 1, startedAt: new Date().toISOString(), results: {} };
     const s: Store = { rounds: [...store.rounds.map(r => r.id === current.id ? closed : r), next], currentId: next.id };
     save(s); setViewId(next.id);
+  }
+
+  // เปิดรอบที่ปิดแล้วกลับมาตรวจต่อ (เผื่อกดปิดผิด / ยังนับไม่เสร็จ)
+  async function reopenRound() {
+    if (!viewing?.closedAt) return;
+    const curHasResults = current && Object.keys(current.results).length > 0;
+    const ok = await confirm({
+      title: isTh
+        ? `เปิดรอบที่ ${viewing.no} กลับมาตรวจต่อ?${curHasResults ? ` (รอบที่ ${current!.no} ที่กำลังตรวจอยู่จะถูกปิดเก็บไว้)` : current ? ` (รอบที่ ${current.no} ที่ว่างอยู่จะถูกลบ)` : ""}`
+        : `Reopen round ${viewing.no} to continue checking?`,
+      confirmLabel: isTh ? "เปิดรอบต่อ" : "Reopen",
+    });
+    if (!ok) return;
+    let rounds = store.rounds;
+    if (current && current.id !== viewing.id) {
+      if (!curHasResults) {
+        rounds = rounds.filter(r => r.id !== current.id);
+      } else {
+        rounds = rounds.map(r => r.id === current.id
+          ? { ...r, closedAt: new Date().toISOString(), items: makeSnapshot(r.results) }
+          : r);
+      }
+    }
+    rounds = rounds.map(r => r.id === viewing.id ? { ...r, closedAt: undefined, items: undefined } : r);
+    save({ rounds, currentId: viewing.id });
+    setViewId(viewing.id);
+  }
+
+  // ลบรอบ
+  async function deleteRound() {
+    if (!viewing) return;
+    const ok = await confirm({
+      title: isTh
+        ? `ลบรอบที่ ${viewing.no}? ผลการตรวจของรอบนี้จะหายถาวร`
+        : `Delete round ${viewing.no}? Its results will be lost permanently`,
+      confirmLabel: isTh ? "ลบรอบ" : "Delete",
+      danger: true,
+    });
+    if (!ok) return;
+    let rounds = store.rounds.filter(r => r.id !== viewing.id);
+    let currentId = store.currentId;
+    if (viewing.id === currentId) {
+      const open = rounds.filter(r => !r.closedAt);
+      if (open.length) {
+        currentId = open[open.length - 1].id;
+      } else {
+        const fresh: Round = {
+          id: uid(),
+          no: (rounds.length ? Math.max(...rounds.map(r => r.no)) : 0) + 1,
+          startedAt: new Date().toISOString(),
+          results: {},
+        };
+        rounds = [...rounds, fresh];
+        currentId = fresh.id;
+      }
+    }
+    save({ rounds, currentId });
+    setViewId(currentId);
   }
 
   // ── พิมพ์รายงาน ──
@@ -317,11 +376,19 @@ ${sections}
           <button onClick={printReport} className="sp-btn-secondary text-xs">
             <Printer size={13} /> {isTh ? "พิมพ์รายงาน" : "Print Report"}
           </button>
-          {!readOnly && (
+          {readOnly ? (
+            <button onClick={reopenRound} className="sp-btn-primary text-xs">
+              <Undo2 size={13} /> {isTh ? "เปิดรอบนี้ต่อ" : "Reopen Round"}
+            </button>
+          ) : (
             <button onClick={closeRound} className="sp-btn-primary text-xs">
               <RotateCcw size={13} /> {isTh ? "ปิดรอบ & เริ่มรอบใหม่" : "Close & New Round"}
             </button>
           )}
+          <button onClick={deleteRound} title={isTh ? "ลบรอบนี้" : "Delete this round"}
+            className="sp-btn-ghost text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-2.5">
+            <Trash2 size={14} />
+          </button>
         </div>
       </div>
 
