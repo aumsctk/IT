@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, X, UserCheck, Check, RotateCcw, Pencil, Printer, History, ChevronDown, Trash2, Undo2 } from "lucide-react";
+import { Search, X, UserCheck, Check, RotateCcw, Pencil, Printer, History, ChevronDown, Trash2, Undo2, CloudOff } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { assetDB, employeeDB, type Asset } from "@/lib/supabaseDB";
+import { assetDB, employeeDB, surveyDB, type Asset, type SurveyRoundRow } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { cn } from "@/lib/utils";
 
@@ -37,26 +37,45 @@ type Round = {
   results: Record<string, SurveyResult>;
   items?: RItem[];               // snapshot ตอนปิดรอบ
 };
-type Store = { rounds: Round[]; currentId: string };
 
 const LS_KEY = "custody_rounds_v1";
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-function loadStore(): Store {
+const toRow = (r: Round): SurveyRoundRow => ({
+  id: r.id, no: r.no, started_at: r.startedAt, closed_at: r.closedAt ?? null,
+  results: r.results as unknown as Record<string, unknown>,
+  items: (r.items as unknown as unknown[]) ?? null,
+});
+const fromRow = (x: SurveyRoundRow): Round => ({
+  id: x.id, no: x.no, startedAt: x.started_at, closedAt: x.closed_at ?? undefined,
+  results: (x.results as unknown as Record<string, SurveyResult>) ?? {},
+  items: (x.items as unknown as RItem[]) ?? undefined,
+});
+
+function loadLocal(): Round[] {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (raw) return JSON.parse(raw);
-    // migrate รุ่นเก่า
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (Array.isArray(s.rounds)) return s.rounds;
+    }
     const old = localStorage.getItem("custody_survey_v1");
     if (old) {
       const o = JSON.parse(old);
-      const r: Round = { id: uid(), no: 1, startedAt: o.startedAt ?? new Date().toISOString(), results: o.results ?? {} };
-      return { rounds: [r], currentId: r.id };
+      return [{ id: uid(), no: 1, startedAt: o.startedAt ?? new Date().toISOString(), results: o.results ?? {} }];
     }
   } catch {}
-  const r: Round = { id: uid(), no: 1, startedAt: new Date().toISOString(), results: {} };
-  return { rounds: [r], currentId: r.id };
+  return [];
 }
+function cacheLocal(rounds: Round[]) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ rounds })); } catch {}
+}
+const newRound = (existing: Round[]): Round => ({
+  id: uid(),
+  no: (existing.length ? Math.max(...existing.map(r => r.no)) : 0) + 1,
+  startedAt: new Date().toISOString(),
+  results: {},
+});
 
 const fmtTh = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" }) : "";
@@ -68,7 +87,9 @@ export default function CustodySurveyPage() {
 
   const [assets, setAssets]       = useState<Asset[]>([]);
   const [employees, setEmployees] = useState<{ id: string; full_name: string }[]>([]);
-  const [store, setStore]         = useState<Store>({ rounds: [], currentId: "" });
+  const [rounds, setRounds]       = useState<Round[]>([]);
+  const [dbReady, setDbReady]     = useState(false);
+  const [dbError, setDbError]     = useState(false);
   const [viewId, setViewId]       = useState("");
   const [search, setSearch]       = useState("");
   const [area, setArea]           = useState("all");
@@ -77,8 +98,33 @@ export default function CustodySurveyPage() {
   const [newName, setNewName]     = useState("");
 
   useEffect(() => {
-    const s = loadStore();
-    setStore(s); setViewId(s.currentId);
+    (async () => {
+      try {
+        let rs = (await surveyDB.getAll()).map(fromRow);
+        if (rs.length === 0) {
+          // ย้ายข้อมูลเดิมจากเครื่องขึ้น Supabase
+          const local = loadLocal();
+          if (local.length) rs = local;
+        }
+        if (!rs.some(r => !r.closedAt)) {
+          rs = [...rs, newRound(rs)];
+        }
+        await surveyDB.saveAll(rs.map(toRow));
+        setRounds(rs);
+        setDbReady(true);
+        const open = rs.filter(r => !r.closedAt);
+        setViewId(open.length ? open[open.length - 1].id : rs[0]?.id ?? "");
+        cacheLocal(rs);
+      } catch {
+        // ตารางยังไม่ถูกสร้าง / ออฟไลน์ → ใช้ข้อมูลในเครื่องไปก่อน
+        setDbError(true);
+        let rs = loadLocal();
+        if (!rs.some(r => !r.closedAt)) rs = [...rs, newRound(rs)];
+        setRounds(rs);
+        const open = rs.filter(r => !r.closedAt);
+        setViewId(open.length ? open[open.length - 1].id : rs[0]?.id ?? "");
+      }
+    })();
     const load = () => {
       assetDB.getAll().then(setAssets);
       employeeDB.getAll().then(all => setEmployees(all.map(e => ({ id: e.id, full_name: e.full_name }))));
@@ -88,14 +134,21 @@ export default function CustodySurveyPage() {
     return () => window.removeEventListener("itam_assets_updated", load);
   }, []);
 
-  const save = (s: Store) => {
-    setStore(s);
-    try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
+  // commit: อัปเดต state + cache + sync ขึ้น Supabase (เก็บทั้งชุดในแถวเดียว)
+  const commit = (next: Round[], _changed?: Round[], _removedIds?: string[]) => {
+    setRounds(next);
+    cacheLocal(next);
+    if (dbReady) {
+      surveyDB.saveAll(next.map(toRow))
+        .then(() => setDbError(false))
+        .catch(() => setDbError(true));
+    }
   };
 
-  const current  = store.rounds.find(r => r.id === store.currentId);
-  const viewing  = store.rounds.find(r => r.id === viewId) ?? current;
-  const readOnly = !!viewing?.closedAt;
+  const openRounds = rounds.filter(r => !r.closedAt);
+  const current    = openRounds.length ? openRounds[openRounds.length - 1] : undefined;
+  const viewing    = rounds.find(r => r.id === viewId) ?? current;
+  const readOnly   = !!viewing?.closedAt;
 
   // ── รายการของรอบที่กำลังดู ──
   const items: RItem[] = useMemo(() => {
@@ -134,12 +187,22 @@ export default function CustodySurveyPage() {
       pct: total ? Math.round((checked / total) * 100) : 0 };
   }, [items]);
 
+  const makeSnapshot = (results: Record<string, SurveyResult>): RItem[] =>
+    assets
+      .filter(a => a.status !== "returned")
+      .map(a => ({
+        id: a.id, tag: a.asset_tag, category: a.category,
+        seat: a.seat_label, room: a.room_name, holder: a.assigned_to_name,
+        result: results[a.id],
+      }));
+
   // ── actions (เฉพาะรอบปัจจุบัน) ──
   const setResult = (id: string, r: SurveyResult | null) => {
     if (!current) return;
     const results = { ...current.results };
     if (r) results[id] = r; else delete results[id];
-    save({ ...store, rounds: store.rounds.map(x => x.id === current.id ? { ...x, results } : x) });
+    const updated = { ...current, results };
+    commit(rounds.map(x => x.id === current.id ? updated : x), [updated]);
   };
 
   function confirmHolder(i: RItem) {
@@ -155,15 +218,6 @@ export default function CustodySurveyPage() {
     window.dispatchEvent(new Event("itam_assets_updated"));
   }
 
-  const makeSnapshot = (results: Record<string, SurveyResult>): RItem[] =>
-    assets
-      .filter(a => a.status !== "returned")
-      .map(a => ({
-        id: a.id, tag: a.asset_tag, category: a.category,
-        seat: a.seat_label, room: a.room_name, holder: a.assigned_to_name,
-        result: results[a.id],
-      }));
-
   async function closeRound() {
     if (!current) return;
     const ok = await confirm({
@@ -174,9 +228,9 @@ export default function CustodySurveyPage() {
     });
     if (!ok) return;
     const closed: Round = { ...current, closedAt: new Date().toISOString(), items: makeSnapshot(current.results) };
-    const next: Round = { id: uid(), no: Math.max(...store.rounds.map(r => r.no)) + 1, startedAt: new Date().toISOString(), results: {} };
-    const s: Store = { rounds: [...store.rounds.map(r => r.id === current.id ? closed : r), next], currentId: next.id };
-    save(s); setViewId(next.id);
+    const next = newRound(rounds);
+    commit([...rounds.map(r => r.id === current.id ? closed : r), next], [closed, next]);
+    setViewId(next.id);
   }
 
   // เปิดรอบที่ปิดแล้วกลับมาตรวจต่อ (เผื่อกดปิดผิด / ยังนับไม่เสร็จ)
@@ -190,19 +244,24 @@ export default function CustodySurveyPage() {
       confirmLabel: isTh ? "เปิดรอบต่อ" : "Reopen",
     });
     if (!ok) return;
-    let rounds = store.rounds;
+    let next = rounds;
+    const changed: Round[] = [];
+    const removed: string[] = [];
     if (current && current.id !== viewing.id) {
       if (!curHasResults) {
-        rounds = rounds.filter(r => r.id !== current.id);
+        next = next.filter(r => r.id !== current.id);
+        removed.push(current.id);
       } else {
-        rounds = rounds.map(r => r.id === current.id
-          ? { ...r, closedAt: new Date().toISOString(), items: makeSnapshot(r.results) }
-          : r);
+        const closedCur = { ...current, closedAt: new Date().toISOString(), items: makeSnapshot(current.results) };
+        next = next.map(r => r.id === current.id ? closedCur : r);
+        changed.push(closedCur);
       }
     }
-    rounds = rounds.map(r => r.id === viewing.id ? { ...r, closedAt: undefined, items: undefined } : r);
-    save({ rounds, currentId: viewing.id });
-    setViewId(viewing.id);
+    const reopened = { ...viewing, closedAt: undefined, items: undefined };
+    next = next.map(r => r.id === viewing.id ? reopened : r);
+    changed.push(reopened);
+    commit(next, changed, removed);
+    setViewId(reopened.id);
   }
 
   // ลบรอบ
@@ -216,25 +275,16 @@ export default function CustodySurveyPage() {
       danger: true,
     });
     if (!ok) return;
-    let rounds = store.rounds.filter(r => r.id !== viewing.id);
-    let currentId = store.currentId;
-    if (viewing.id === currentId) {
-      const open = rounds.filter(r => !r.closedAt);
-      if (open.length) {
-        currentId = open[open.length - 1].id;
-      } else {
-        const fresh: Round = {
-          id: uid(),
-          no: (rounds.length ? Math.max(...rounds.map(r => r.no)) : 0) + 1,
-          startedAt: new Date().toISOString(),
-          results: {},
-        };
-        rounds = [...rounds, fresh];
-        currentId = fresh.id;
-      }
+    let next = rounds.filter(r => r.id !== viewing.id);
+    const changed: Round[] = [];
+    if (!next.some(r => !r.closedAt)) {
+      const fresh = newRound(next);
+      next = [...next, fresh];
+      changed.push(fresh);
     }
-    save({ rounds, currentId });
-    setViewId(currentId);
+    commit(next, changed, [viewing.id]);
+    const open = next.filter(r => !r.closedAt);
+    setViewId(open.length ? open[open.length - 1].id : next[0]?.id ?? "");
   }
 
   // ── พิมพ์รายงาน ──
@@ -365,7 +415,7 @@ ${sections}
           {/* Round selector */}
           <div className="relative">
             <select value={viewId} onChange={e => setViewId(e.target.value)} className="sp-select pr-8 appearance-none">
-              {[...store.rounds].sort((a, b) => b.no - a.no).map(r => (
+              {[...rounds].sort((a, b) => b.no - a.no).map(r => (
                 <option key={r.id} value={r.id}>
                   {isTh ? `รอบที่ ${r.no}` : `Round ${r.no}`} — {fmtTh(r.startedAt)}{r.closedAt ? "" : (isTh ? " (ปัจจุบัน)" : " (current)")}
                 </option>
@@ -391,6 +441,16 @@ ${sections}
           </button>
         </div>
       </div>
+
+      {/* DB warning */}
+      {dbError && (
+        <div className="mx-6 md:mx-8 mt-3 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50/90 px-4 py-2.5 text-xs text-amber-800">
+          <CloudOff size={14} className="shrink-0" />
+          {isTh
+            ? "ซิงก์กับฐานข้อมูลไม่สำเร็จ — ข้อมูลรอบถูกเก็บไว้ในเครื่องนี้ชั่วคราว จะซิงก์ให้อัตโนมัติเมื่อเชื่อมต่อได้"
+            : "Database sync failed — rounds are stored locally for now and will sync when connection is restored"}
+        </div>
+      )}
 
       {/* Stats + progress */}
       <div className="px-6 md:px-8 pt-4">

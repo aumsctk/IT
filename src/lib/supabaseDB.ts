@@ -242,5 +242,65 @@ export async function removeAssetTagFromFloorPlan(assetTag: string): Promise<voi
   }
 }
 
+// ── FLOOR PLAN (Supabase — sync ทุกเครื่อง) ──────────────────────
+// 1 แถวต่อ 1 พื้นที่: floor_key = floor id, data = { label, order, zones, seats }
+export const floorplanDB = {
+  async getAll(): Promise<{ floors: { id: string; label: string }[]; data: Record<string, { zones: unknown[]; seats: unknown[] }> } | null> {
+    const { data, error } = await sb().from("floor_plan_data").select("floor_key, data");
+    if (error) throw error;
+    const rows = (data ?? []).filter((r: { data?: { zones?: unknown; seats?: unknown } }) => r.data && (r.data.zones || r.data.seats));
+    if (rows.length === 0) return null;
+    rows.sort((a: { data: { order?: number } }, b: { data: { order?: number } }) => (a.data.order ?? 0) - (b.data.order ?? 0));
+    const floors = rows.map((r: { floor_key: string; data: { label?: string } }) => ({ id: r.floor_key, label: r.data.label ?? r.floor_key }));
+    const map: Record<string, { zones: unknown[]; seats: unknown[] }> = {};
+    rows.forEach((r: { floor_key: string; data: { zones?: unknown[]; seats?: unknown[] } }) => {
+      map[r.floor_key] = { zones: r.data.zones ?? [], seats: r.data.seats ?? [] };
+    });
+    return { floors, data: map };
+  },
+  async saveAll(
+    floors: { id: string; label: string }[],
+    data: Record<string, { zones: unknown[]; seats: unknown[] }>
+  ): Promise<void> {
+    const rows = floors.map((f, i) => ({
+      floor_key: f.id,
+      data: { label: f.label, order: i, zones: data[f.id]?.zones ?? [], seats: data[f.id]?.seats ?? [] },
+    }));
+    const { error } = await sb().from("floor_plan_data").upsert(rows, { onConflict: "floor_key" });
+    if (error) throw error;
+    // ลบพื้นที่ที่ถูกเอาออก (ข้าม key พิเศษที่ขึ้นต้นด้วย "_")
+    const keep = new Set(floors.map(f => f.id));
+    const { data: all } = await sb().from("floor_plan_data").select("floor_key");
+    const stale = (all ?? [])
+      .map((r: { floor_key: string }) => r.floor_key)
+      .filter((k: string) => !keep.has(k) && !k.startsWith("_"));
+    if (stale.length) await sb().from("floor_plan_data").delete().in("floor_key", stale);
+  },
+};
+
+// ── SURVEY ROUNDS (รอบสำรวจผู้ถือครอง) ──────────────────────────
+// เก็บใน floor_plan_data row พิเศษ floor_key = "_survey_rounds"
+// (ใช้ตารางเดิม — ไม่ต้องสร้างตารางใหม่)
+const SURVEY_KEY = "_survey_rounds";
+export type SurveyRoundRow = {
+  id: string; no: number;
+  started_at: string; closed_at: string | null;
+  results: Record<string, unknown>; items: unknown[] | null;
+};
+export const surveyDB = {
+  async getAll(): Promise<SurveyRoundRow[]> {
+    const { data, error } = await sb()
+      .from("floor_plan_data").select("data").eq("floor_key", SURVEY_KEY).maybeSingle();
+    if (error) throw error;
+    return ((data?.data as { rounds?: SurveyRoundRow[] })?.rounds ?? []) as SurveyRoundRow[];
+  },
+  async saveAll(rounds: SurveyRoundRow[]): Promise<void> {
+    const { error } = await sb()
+      .from("floor_plan_data")
+      .upsert({ floor_key: SURVEY_KEY, data: { rounds } }, { onConflict: "floor_key" });
+    if (error) throw error;
+  },
+};
+
 // Re-export types from localDB so consumers can import from supabaseDB
 export type { Asset, Ticket, Employee, TicketComment, AuditSession, AuditItem } from "@/lib/localDB";

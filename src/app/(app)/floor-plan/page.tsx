@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { employeeDB, assetDB, ticketDB } from "@/lib/supabaseDB";
+import { employeeDB, assetDB, ticketDB, floorplanDB } from "@/lib/supabaseDB";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { SEED_FLOORS, SEED_FLOORPLAN, SEED_ASSETS } from "@/lib/seed/plan2569";
 
@@ -110,32 +110,58 @@ export default function FloorPlanPage() {
   const [repairSet, setRepairSet] = useState<Set<string>>(new Set());
   const { confirm, ConfirmUI } = useConfirm();
 
-  // ── localStorage persistence ──────────────────────────────────────
+  // ── Persistence: Supabase = source of truth (sync ทุกเครื่อง) ──────
+  // localStorage ใช้เป็น cache ให้หน้า dashboard / audit อ่านต่อได้
   const [_loaded, _setLoaded] = useState(false);
+  const [syncErr, setSyncErr] = useState(false);
   useEffect(() => {
-    try {
-      // Version check — if version mismatch, reset to INIT
-      const ver = localStorage.getItem("floorplan_version");
-      if (ver !== FLOORPLAN_VERSION) {
-        localStorage.removeItem("floorplan_floors");
-        localStorage.removeItem("floorplan_data");
-        localStorage.removeItem("floorplan_current");
-        localStorage.setItem("floorplan_version", FLOORPLAN_VERSION);
-        setFloors(INIT_FLOORS);
-        setFloorData(INIT_DATA);
-        setCurrentId(INIT_FLOORS[0]?.id ?? "fl1");
-      } else {
-        const f = localStorage.getItem("floorplan_floors");   if (f) setFloors(JSON.parse(f));
-        const d = localStorage.getItem("floorplan_data");     if (d) setFloorData(JSON.parse(d));
-        const c = localStorage.getItem("floorplan_current");  if (c) setCurrentId(c);
+    (async () => {
+      try {
+        const remote = await floorplanDB.getAll();
+        if (remote) {
+          setFloors(remote.floors as Floor[]);
+          setFloorData(remote.data as Record<string, FloorData>);
+          const c = localStorage.getItem("floorplan_current");
+          setCurrentId(c && (remote.data as Record<string, FloorData>)[c] ? c : remote.floors[0]?.id ?? "fl1");
+          try { localStorage.setItem("floorplan_data", JSON.stringify(remote.data)); } catch {}
+        } else {
+          // ครั้งแรก: ใช้ผังตั้งต้นจากไฟล์ Excel แล้วบันทึกขึ้น Supabase
+          setFloors(INIT_FLOORS);
+          setFloorData(INIT_DATA);
+          setCurrentId(INIT_FLOORS[0]?.id ?? "fl1");
+          await floorplanDB.saveAll(INIT_FLOORS, INIT_DATA as Record<string, { zones: unknown[]; seats: unknown[] }>).catch(() => setSyncErr(true));
+          try { localStorage.setItem("floorplan_data", JSON.stringify(INIT_DATA)); } catch {}
+        }
+      } catch {
+        // ออฟไลน์ / ดึงไม่ได้ → ใช้ cache เดิมในเครื่อง
+        setSyncErr(true);
+        try {
+          const f = localStorage.getItem("floorplan_floors");   if (f) setFloors(JSON.parse(f));
+          const d = localStorage.getItem("floorplan_data");     if (d) setFloorData(JSON.parse(d));
+          const c = localStorage.getItem("floorplan_current");  if (c) setCurrentId(c);
+        } catch {}
+      }
+      try {
         const def = { vacant:true,occupied:true,maintenance:true,broken:true,names:true,ports:false,assets:true };
         const l = localStorage.getItem("floorplan_layers");   if (l) setLayers({ ...def, ...JSON.parse(l) });
-      }
-    } catch {}
-    _setLoaded(true);
+      } catch {}
+      _setLoaded(true);
+    })();
   }, []);
-  useEffect(() => { if (_loaded) { try { localStorage.setItem("floorplan_floors",  JSON.stringify(floors));    } catch {} } }, [floors, _loaded]);
-  useEffect(() => { if (_loaded) { try { localStorage.setItem("floorplan_data",    JSON.stringify(floorData)); } catch {} } }, [floorData, _loaded]);
+  // บันทึกแบบหน่วงเวลา (debounce) ขึ้น Supabase + cache ลงเครื่อง
+  useEffect(() => {
+    if (!_loaded) return;
+    try {
+      localStorage.setItem("floorplan_floors", JSON.stringify(floors));
+      localStorage.setItem("floorplan_data",   JSON.stringify(floorData));
+    } catch {}
+    const t = setTimeout(() => {
+      floorplanDB.saveAll(floors, floorData as Record<string, { zones: unknown[]; seats: unknown[] }>)
+        .then(() => setSyncErr(false))
+        .catch(() => setSyncErr(true));
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [floors, floorData, _loaded]);
   useEffect(() => { if (_loaded) { try { localStorage.setItem("floorplan_current", currentId);                } catch {} } }, [currentId, _loaded]);
   useEffect(() => { if (_loaded) { try { localStorage.setItem("floorplan_layers",  JSON.stringify(layers));   } catch {} } }, [layers, _loaded]);
 
@@ -490,6 +516,11 @@ export default function FloorPlanPage() {
             <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium">
               {tool==="add_seat"?(isTh?"คลิกเพื่อวางโต๊ะ":"Click to place desk"):(isTh?"คลิกเพื่อสร้างโซน":"Click to create zone")}
               &nbsp;·&nbsp;<button onClick={()=>setTool("select")} className="underline">{isTh?"ยกเลิก":"Cancel"}</button>
+            </span>
+          )}
+          {syncErr && (
+            <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-[10px] font-semibold">
+              ⚠ {isTh?"ซิงก์ไม่สำเร็จ — บันทึกไว้ในเครื่องชั่วคราว":"Sync failed — saved locally"}
             </span>
           )}
           <div className="flex-1"/>
