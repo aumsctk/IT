@@ -34,7 +34,7 @@ export function MobileNav({ items }: MobileNavProps) {
   return (
     <nav className="fixed bottom-3 inset-x-3 z-30 md:hidden pb-[env(safe-area-inset-bottom)]">
       <div
-        className="rounded-3xl overflow-hidden"
+        className="mobile-glass-bar rounded-3xl overflow-hidden"
         style={{
           background: "rgba(255,255,255,0.68)",
           backdropFilter: "blur(24px) saturate(180%)",
