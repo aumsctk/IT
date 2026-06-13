@@ -147,6 +147,7 @@ export default function FloorPlanPage() {
   const [currentId,   setCurrentId]   = useState(INIT_FLOORS[0]?.id ?? "fl1");
   const [selected,    setSelected]    = useState<Seat | null>(null);
   const [selectedItem,setSelectedItem]= useState<FItem | null>(null);
+  const [selectedZone,setSelectedZone]= useState<Zone | null>(null);
   const [editModal,   setEditModal]   = useState<Seat | null>(null);
   const [zoneModal,   setZoneModal]   = useState<Zone | null | "new">(null);
   const [floorModal,  setFloorModal]  = useState<Floor | null | "new">(null);
@@ -312,7 +313,7 @@ export default function FloorPlanPage() {
         if (e.key === "v" || e.key === "V") { setPendingKind(null); return; }
         if (e.key === "Escape") { setPendingKind(null); setSelected(null); setSelectedItem(null); return; }
       }
-      const hasSel = selected || selectedItem;
+      const hasSel = selected || selectedItem || selectedZone;
       if (!hasSel) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
@@ -322,6 +323,9 @@ export default function FloorPlanPage() {
         } else if (selectedItem) {
           confirm({ title: `ลบ ${selectedItem.label}?`, confirmLabel: "ลบ", danger: true })
             .then(ok => { if (ok) { setItems(p => p.filter(i => i.id !== selectedItem.id)); setSelectedItem(null); } });
+        } else if (selectedZone) {
+          confirm({ title: `ลบโซน ${selectedZone.label}?`, confirmLabel: "ลบ", danger: true })
+            .then(ok => { if (ok) { setZones(p => p.filter(z => z.id !== selectedZone.id)); setSelectedZone(null); } });
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "d" && selected) { e.preventDefault(); duplicateSeat(selected); }
@@ -354,7 +358,7 @@ export default function FloorPlanPage() {
   function handleCanvasClick(e: React.MouseEvent) {
     const rect = canvasRef.current!.getBoundingClientRect();
     const cx = snap((e.clientX - rect.left) / zoom - 40), cy = snap((e.clientY - rect.top) / zoom - 30);
-    if (!pendingKind) { setSelected(null); setSelectedItem(null); setShowLy(false); return; }
+    if (!pendingKind) { setSelected(null); setSelectedItem(null); setSelectedZone(null); setShowLy(false); return; }
     if (pendingKind === "desk") {
       const s: Seat = { id: uid(), label: `S-${(seats.length + 1).toString().padStart(2, "0")}`, x: cx, y: cy, w: 104, h: 104, status: "vacant", asset_tags: [] };
       setSeats(p => [...p, s]); setPendingKind(null); setSelected(s);
@@ -431,7 +435,7 @@ export default function FloorPlanPage() {
         <div className="flex items-end gap-0.5 flex-1 overflow-x-auto pb-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth:"none" }}>
           {floors.map(fl => (
             <div key={fl.id} className="group flex items-center flex-shrink-0">
-              <button onClick={() => { setCurrentId(fl.id); setSelected(null); setSelectedItem(null); setSearchResult(null); setSearch(""); }}
+              <button onClick={() => { setCurrentId(fl.id); setSelected(null); setSelectedItem(null); setSelectedZone(null); setSearchResult(null); setSearch(""); }}
                 className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-t-xl border-t border-x transition-all ${currentId === fl.id ? "bg-white/80 border-white/70 text-indigo-700 -mb-px z-10 shadow-sm" : "bg-transparent border-transparent text-slate-500 hover:text-slate-700 hover:bg-white/30"}`}>
                 <Square size={10} className="opacity-50" />{fl.label}
               </button>
@@ -621,14 +625,19 @@ export default function FloorPlanPage() {
               {/* Zones */}
               {zones.map(zone => {
                 const bc = ZONE_BORDER[zone.color] ?? "#94a3b8";
+                const isZSel = selectedZone?.id === zone.id;
                 return (
-                  <div key={zone.id} style={{ position:"absolute", left:zone.x, top:zone.y, width:zone.w, height:zone.h, backgroundColor:zone.color+"cc", border:`1.5px solid ${bc}`, borderRadius:12, boxSizing:"border-box" }}>
-                    <div onMouseDown={e => startMoveZone(e, zone)} onDoubleClick={e => { e.stopPropagation(); setZoneModal(zone); }}
-                      style={{ display:"inline-flex", alignItems:"center", gap:4, margin:"6px 0 0 6px", padding:"3px 8px", background:"rgba(255,255,255,0.80)", backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)", borderRadius:6, border:`1px solid ${bc}66`, fontSize:10, fontWeight:700, color:"#475569", cursor:"move", userSelect:"none" }}>
+                  <div key={zone.id}
+                    onMouseDown={e => { if (!pendingKind) startMoveZone(e, zone); }}
+                    onClick={e => { if (!pendingKind) { e.stopPropagation(); setSelected(null); setSelectedItem(null); setSelectedZone(zone); } }}
+                    onDoubleClick={e => { e.stopPropagation(); setZoneModal(zone); }}
+                    style={{ position:"absolute", left:zone.x, top:zone.y, width:zone.w, height:zone.h, backgroundColor:zone.color+"cc", border:`${isZSel?"2":"1.5"}px solid ${isZSel?"#6366f1":bc}`, borderRadius:12, boxSizing:"border-box", cursor:pendingKind?"crosshair":"move", zIndex:isZSel?3:1, outline:isZSel?"3px solid rgba(99,102,241,0.18)":"none", userSelect:"none" }}>
+                    <div onDoubleClick={e => { e.stopPropagation(); setZoneModal(zone); }}
+                      style={{ display:"inline-flex", alignItems:"center", gap:4, margin:"6px 0 0 6px", padding:"3px 8px", background:"rgba(255,255,255,0.80)", backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)", borderRadius:6, border:`1px solid ${bc}66`, fontSize:10, fontWeight:700, color:"#475569", cursor:"move", pointerEvents:"none", userSelect:"none" }}>
                       <Square size={8} style={{ color:bc, opacity:0.8 }} />{zone.label}
                     </div>
                     {(["nw","ne","sw","se","n","s","e","w"] as ResizeEdge[]).map(edge => (
-                      <RHandle key={edge} edge={edge} color={bc} onMouseDown={e => startResizeZone(e, zone, edge)} />
+                      <RHandle key={edge} edge={edge} color={isZSel?"#6366f1":bc} onMouseDown={e => startResizeZone(e, zone, edge)} />
                     ))}
                   </div>
                 );
@@ -797,6 +806,38 @@ export default function FloorPlanPage() {
                     onBlur={e => { const u={...selectedItem,label:e.target.value}; setItems(p=>p.map(i=>i.id===selectedItem.id?u:i)); setSelectedItem(u); }}
                     className="w-full text-xs border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-300/50 bg-white/70" />
                 </div>
+              </div>
+            </>
+          ) : selectedZone ? (
+            <>
+              <div className="px-4 py-3 border-b border-white/40 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-3 h-3 rounded flex-shrink-0 border" style={{ background:selectedZone.color, borderColor:ZONE_BORDER[selectedZone.color]??"#cbd5e1" }} />
+                  <span className="font-bold text-sm text-slate-900 truncate">{selectedZone.label}</span>
+                </div>
+                <button onClick={() => setSelectedZone(null)} className="text-slate-400 hover:text-slate-700 flex-shrink-0 ml-2"><X size={15} /></button>
+              </div>
+              <div className="px-3 py-2.5 border-b border-white/40 flex gap-2 flex-shrink-0">
+                <button onClick={() => setZoneModal(selectedZone)}
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl py-1.5 text-xs font-medium transition-colors">
+                  <Pencil size={11} />{isTh?"แก้ไข":"Edit"}
+                </button>
+                <button onClick={async () => {
+                  const ok = await confirm({ title:isTh?`ลบโซน ${selectedZone.label}?`:`Delete zone ${selectedZone.label}?`, confirmLabel:isTh?"ลบ":"Delete", danger:true });
+                  if (ok) { setZones(p => p.filter(z => z.id!==selectedZone.id)); setSelectedZone(null); }
+                }} className="flex items-center justify-center w-8 h-8 border border-red-200/80 text-red-500 hover:bg-red-50/80 rounded-xl transition-colors">
+                  <Trash2 size={12} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+                <div><PropLabel>{isTh?"ตำแหน่ง":"Position"}</PropLabel>
+                  <div className="grid grid-cols-2 gap-1.5"><PropVal label="X" value={String(selectedZone.x)} mono /><PropVal label="Y" value={String(selectedZone.y)} mono /></div>
+                </div>
+                <div><PropLabel>{isTh?"ขนาด":"Size"}</PropLabel>
+                  <div className="grid grid-cols-2 gap-1.5"><PropVal label="W" value={String(selectedZone.w)} mono /><PropVal label="H" value={String(selectedZone.h)} mono /></div>
+                </div>
+                <p className="text-[10px] text-slate-400">{isTh?"ดับเบิลคลิก canvas เพื่อแก้ไขชื่อ/สี":"Double-click zone to edit label/color"}</p>
+                <p className="text-[10px] text-slate-400">{isTh?"กด Del เพื่อลบ":"Press Del to delete"}</p>
               </div>
             </>
           ) : (
